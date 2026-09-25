@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" class="dark scroll-smooth">
+  <head>
+    <script>
+      (function() {
+        try {
+          var _rawFetch = window.fetch;
+          var _currentFetch = function() {
+            return (_rawFetch || window.fetch).apply(window, arguments);
+          };
+          try {
+            Object.defineProperty(window, 'fetch', {
+              get: function() { return _currentFetch; },
+              set: function(fn) { _currentFetch = fn; },
+              configurable: true,
+              enumerable: true
+            });
+          } catch (e1) {
+            try {
+              if (typeof Window !== 'undefined' && Window.prototype) {
+                Object.defineProperty(Window.prototype, 'fetch', {
+                  get: function() { return _currentFetch; },
+                  set: function(fn) { _currentFetch = fn; },
+                  configurable: true,
+                  enumerable: true
+                });
+              }
+            } catch (e2) {}
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DIGEGAIN - AI-Powered Digital Growth & Web Systems</title>
+    <meta name="description" content="DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses." />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/logo/digergain-transparent.png" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://digergain.com/" />
+    <meta property="og:title" content="DIGEGAIN - AI-Powered Digital Growth & Web Systems" />
+    <meta property="og:description" content="DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses." />
+    <meta property="og:image" content="/logo/digergain-transparent.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DIGEGAIN - AI-Powered Digital Growth & Web Systems" />
+    <meta name="twitter:description" content="DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses." />
+    <meta name="twitter:image" content="/logo/digergain-transparent.png" />
+
+    <!-- Fonts: Sora (Geometric Display) + Plus Jakarta Sans (Body) + JetBrains Mono (Tech labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-[#060D1A] text-[#EAF3FF] selection:bg-[#1E8FCC]/30 selection:text-[#29B6F6] antialiased overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,44 @@
+{
+  "contact": {
+    "companyName": "DIGEGAIN",
+    "tagline": "AI-Powered Web Systems & Digital Growth",
+    "email": "hello@digergain.com",
+    "phone": "+91 98470 12345",
+    "whatsappNumber": "919847012345",
+    "whatsappMessage": "Hi DIGEGAIN, I'd like to discuss a project.",
+    "address": {
+      "street": "Infopark Phase 2, Kakkanad",
+      "city": "Kochi",
+      "state": "Kerala",
+      "postalCode": "682042",
+      "country": "IN"
+    },
+    "geo": { "lat": 9.9984, "lng": 76.3575 },
+    "googleBusinessProfileUrl": "https://maps.google.com/?cid=digergain",
+    "googleMapsEmbedUrl": "",
+    "googleReviewUrl": "",
+    "workingHours": [{ "days": "Mon–Sat", "opens": "09:00", "closes": "18:00" }],
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "linkedin": "",
+      "youtube": "",
+      "twitter": "",
+      "behance": ""
+    }
+  },
+  "portfolio": [],
+  "leads": [],
+  "assistant": {
+    "enabled": true,
+    "name": "DIGEGAIN AI",
+    "greeting": "Hi! I'm DIGEGAIN's AI assistant. Ask me about our services, our approach, or past projects.",
+    "suggestedQuestions": ["What services do you offer?", "Show me your portfolio", "How can I contact you?"],
+    "extraKnowledge": [],
+    "leadCaptureEnabled": true
+  },
+  "settings": {
+    "notifyEmail": "anoopkp10@gmail.com",
+    "siteUrl": "https://digergain.com"
+  }
+}
