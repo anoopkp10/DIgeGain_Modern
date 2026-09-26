@@ -243,6 +243,12 @@ app.post('/api/contact-form', async (req, res) => {
     return res.status(400).json({ error: 'Spam detected' });
   }
 
+  // Validate mandatory phone/WhatsApp for contact-form submissions
+  const cleanPhoneDigits = (phone || '').replace(/[^0-9]/g, '');
+  if (req.body.source !== 'ai-assistant' && (!phone || cleanPhoneDigits.length < 7)) {
+    return res.status(400).json({ error: 'Please provide a valid Phone / WhatsApp number (minimum 7 digits).' });
+  }
+
   // 3. Prepare and persist Lead first so data is never lost
   const leadId = `lead-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
   const leadData = {

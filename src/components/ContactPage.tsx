@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ContactData } from '../lib/validators.ts';
 import {
-  Phone,
   Mail,
   MapPin,
   Clock,
@@ -13,6 +12,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { trackConversion } from '../lib/analytics.ts';
 
 interface ContactPageProps {
   contact: ContactData;
@@ -30,7 +30,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
     email: '',
     phone: '',
     service: preselectedService || 'Booking & Appointment System',
-    budget: '₹50,000 - ₹1,00,000',
     message: '',
     website_trap: '', // honeypot
   });
@@ -48,14 +47,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
     'Custom Web Architecture',
   ];
 
-  const budgetOptions = [
-    '₹30,000 - ₹50,000',
-    '₹50,000 - ₹1,00,000',
-    '₹1,00,000 - ₹2,50,000',
-    '₹2,50,000+',
-    'Flexible / Seeking Consultation',
-  ];
-
   const triggerBrandConfetti = () => {
     // Confetti in brand colors: Orange (#EA580C), Blue (#0284C7), Green (#16A34A), Sky (#0EA5E9)
     confetti({
@@ -70,6 +61,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
+
+    // Phone / WhatsApp mandatory validation
+    const digitsOnly = formData.phone.trim().replace(/[^0-9]/g, '');
+    if (!formData.phone.trim() || digitsOnly.length < 7) {
+      setErrorMsg('Please provide a valid Phone / WhatsApp number (minimum 7 digits).');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -86,12 +85,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
       setSuccessMsg(data.message || 'Thank you! Your project inquiry has been received.');
       triggerBrandConfetti();
+      trackConversion('contact_form_submit', {
+        service: formData.service,
+      });
       setFormData({
         name: '',
         email: '',
         phone: '',
         service: 'Booking & Appointment System',
-        budget: '₹50,000 - ₹1,00,000',
         message: '',
         website_trap: '',
       });
@@ -102,7 +103,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
     }
   };
 
-  const cleanPhone = (contact.phone || '').replace(/[^0-9+]/g, '');
   const waUrl = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(contact.whatsappMessage || 'Hi DIGEGAIN')}`;
 
   return (
@@ -213,10 +213,11 @@ export const ContactPage: React.FC<ContactPageProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-slate-300 block">
-                    Phone / WhatsApp (Optional)
+                    Phone / WhatsApp <span className="text-[#0EA5E9]">*</span>
                   </label>
                   <input
                     type="tel"
+                    required
                     placeholder="+91 98470 12345"
                     value={formData.phone}
                     onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
@@ -239,28 +240,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                       </option>
                     ))}
                   </select>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-slate-300 block">
-                  Estimated Budget Range
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {budgetOptions.map(b => (
-                    <button
-                      type="button"
-                      key={b}
-                      onClick={() => setFormData(prev => ({ ...prev, budget: b }))}
-                      className={`px-3 py-2 rounded-lg text-xs font-mono text-center transition-all ${
-                        formData.budget === b
-                          ? 'bg-[#0284C7] text-white font-semibold shadow-md shadow-[#0284C7]/30'
-                          : 'bg-[#060D1A] text-slate-400 border border-white/5 hover:border-white/20'
-                      }`}
-                    >
-                      {b}
-                    </button>
-                  ))}
                 </div>
               </div>
 
@@ -322,24 +301,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 </div>
                 <ExternalLink className="w-4 h-4 text-[#25D366] group-hover:translate-x-0.5 transition-transform" />
               </a>
-
-              {contact.phone && (
-                <a
-                  href={`tel:${cleanPhone}`}
-                  className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#0284C7]/20 border border-[#0284C7]/40 flex items-center justify-center text-[#0EA5E9]">
-                      <Phone className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-mono text-slate-400">Direct Telephone</div>
-                      <div className="text-sm font-bold">{contact.phone}</div>
-                    </div>
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-                </a>
-              )}
 
               <a
                 href={`mailto:${contact.email}`}
@@ -407,32 +368,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 Kochi Infopark Phase 2 · Kerala
               </div>
             )}
-
-            {/* Google Business Profile Actions */}
-            <div className="flex items-center gap-3 pt-2">
-              {contact.googleBusinessProfileUrl && (
-                <a
-                  href={contact.googleBusinessProfileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-center text-slate-200 hover:text-white transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <span>Get Directions</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              )}
-              {contact.googleReviewUrl && (
-                <a
-                  href={contact.googleReviewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2 px-3 rounded-lg bg-[#EA580C]/10 hover:bg-[#EA580C]/20 border border-[#EA580C]/30 text-xs font-semibold text-center text-[#EA580C] transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <Star className="w-3 h-3 fill-[#EA580C]" />
-                  <span>Leave a Review</span>
-                </a>
-              )}
-            </div>
           </div>
         </div>
       </div>

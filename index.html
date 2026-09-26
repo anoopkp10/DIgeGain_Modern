@@ -1,6 +1,17 @@
 <!doctype html>
 <html lang="en" class="dark scroll-smooth">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J2ZFSD2WPS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-J2ZFSD2WPS', {
+        send_page_view: true
+      });
+    </script>
     <script>
       (function() {
         try {
@@ -39,8 +50,12 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/logo/digergain-transparent.png" />
     
+    <!-- Canonical & SEO -->
+    <link rel="canonical" href="https://digergain.com/" />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DIGEGAIN" />
     <meta property="og:url" content="https://digergain.com/" />
     <meta property="og:title" content="DIGEGAIN - AI-Powered Digital Growth & Web Systems" />
     <meta property="og:description" content="DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses." />
@@ -51,6 +66,50 @@
     <meta name="twitter:title" content="DIGEGAIN - AI-Powered Digital Growth & Web Systems" />
     <meta name="twitter:description" content="DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses." />
     <meta name="twitter:image" content="/logo/digergain-transparent.png" />
+
+    <!-- Base Schema.org Structured Data (Organization & GeoCoordinates for SEO / GEO / AEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "DIGEGAIN",
+      "url": "https://digergain.com",
+      "logo": "https://digergain.com/logo/digergain.svg",
+      "image": "https://digergain.com/logo/digergain-transparent.png",
+      "description": "AI-powered digital growth company building websites, booking systems, order engines, and custom dashboards for service businesses.",
+      "telephone": "+91 98470 12345",
+      "email": "hello@digergain.com",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Infopark Phase 2, SmartCity Road, Kakkanad",
+        "addressLocality": "Kochi",
+        "addressRegion": "Kerala",
+        "postalCode": "682042",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 9.9984,
+        "longitude": 76.3575
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "opens": "09:00",
+          "closes": "18:00"
+        }
+      ],
+      "sameAs": [
+        "https://facebook.com/digergain",
+        "https://instagram.com/digergain",
+        "https://linkedin.com/company/digergain",
+        "https://youtube.com/@digergain",
+        "https://x.com/digergain"
+      ]
+    }
+    </script>
 
     <!-- Fonts: Sora (Geometric Display) + Plus Jakarta Sans (Body) + JetBrains Mono (Tech labels) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

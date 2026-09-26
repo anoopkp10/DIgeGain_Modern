@@ -59,7 +59,6 @@ export function renderClientConfirmationEmail(lead: LeadData, contact: ContactDa
 
       <div style="margin-top: 28px;">
         <a href="${waUrl}" class="btn btn-wa">Chat on WhatsApp</a>
-        <a href="tel:${contact.phone.replace(/[^0-9+]/g, '')}" class="btn">Call ${contact.phone}</a>
       </div>
     </div>
     <div class="footer">
@@ -75,14 +74,12 @@ export function renderClientConfirmationEmail(lead: LeadData, contact: ContactDa
 Hello ${lead.name},
 
 Thank you for contacting DIGEGAIN. We have received your inquiry regarding:
-Service: ${lead.service}
-Budget: ${lead.budget || 'Not specified'}
+Service: ${lead.service}${lead.budget ? `\nBudget: ${lead.budget}` : ''}
 Message: ${lead.message}
 
 Our team will review your requirements and respond within 24 hours.
 Need immediate assistance?
 WhatsApp: ${waUrl}
-Call: ${contact.phone}
 
 Best regards,
 DIGEGAIN Team
@@ -132,7 +129,7 @@ export function renderAdminNotificationEmail(lead: LeadData, contact: ContactDat
     <div class="field"><span class="label">Email:</span> <span class="val"><a href="mailto:${safeEmail}">${safeEmail}</a></span></div>
     <div class="field"><span class="label">Phone:</span> <span class="val">${safePhone}</span></div>
     <div class="field"><span class="label">Service:</span> <span class="val"><strong>${safeService}</strong></span></div>
-    <div class="field"><span class="label">Budget:</span> <span class="val">${safeBudget}</span></div>
+    ${lead.budget ? `<div class="field"><span class="label">Budget:</span> <span class="val">${safeBudget}</span></div>` : ''}
     <div class="field"><span class="label">Submitted:</span> <span class="val">${new Date(lead.createdAt).toLocaleString()}</span></div>
 
     <div class="msg">
@@ -155,8 +152,7 @@ Source: ${lead.source}
 Name: ${lead.name}
 Email: ${lead.email}
 Phone: ${lead.phone || 'None'}
-Service: ${lead.service}
-Budget: ${lead.budget || 'Not specified'}
+Service: ${lead.service}${lead.budget ? `\nBudget: ${lead.budget}` : ''}
 Date: ${new Date(lead.createdAt).toISOString()}
 
 Message:

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { AppData } from './lib/validators.ts';
+import {
+  generateOrganizationJsonLd,
+  generateFaqJsonLd,
+  generatePortfolioJsonLd,
+} from './lib/seo.ts';
 import { Header } from './components/Header.tsx';
 import { Footer } from './components/Footer.tsx';
 import { Hero } from './components/Hero.tsx';
@@ -74,6 +79,51 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // SEO, AEO & GEO: Dynamic Metadata & Schema.org JSON-LD Injection
+  useEffect(() => {
+    // 1. Dynamic Page Titles for SEO
+    if (currentPath === '/portfolio') {
+      document.title = 'Portfolio & Case Studies | DIGEGAIN Web Systems';
+    } else if (currentPath === '/contact') {
+      document.title = 'Contact DIGEGAIN | AI Web Development & Tech Solutions';
+    } else if (currentPath === '/admin' || currentPath.startsWith('/admin/')) {
+      document.title = 'DIGEGAIN Admin Console';
+    } else {
+      document.title = 'DIGEGAIN - AI-Powered Digital Growth & Web Systems';
+    }
+
+    // 2. Structured Data (JSON-LD) for Search Engines (SEO), Answer Engines (AEO), and Local Maps (GEO)
+    if (!appData) return;
+    const siteUrl = appData.settings.siteUrl || window.location.origin;
+
+    const injectJsonLd = (id: string, data: object) => {
+      let script = document.getElementById(id) as HTMLScriptElement | null;
+      if (!script) {
+        script = document.createElement('script');
+        script.id = id;
+        script.type = 'application/ld+json';
+        document.head.appendChild(script);
+      }
+      script.text = JSON.stringify(data);
+    };
+
+    // Organization & LocalBusiness with GeoCoordinates (GEO & SEO)
+    injectJsonLd('schema-org-jsonld', generateOrganizationJsonLd(appData, siteUrl));
+    // FAQPage schema for Perplexity / Google AI Overviews / Answer Engines (AEO)
+    injectJsonLd('schema-faq-jsonld', generateFaqJsonLd(appData));
+    // Portfolio ItemList schema for rich search cards (SEO)
+    injectJsonLd('schema-portfolio-jsonld', generatePortfolioJsonLd(appData, siteUrl));
+
+    // 3. Google Analytics (GA4) SPA Pageview Tracking
+    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+      (window as any).gtag('event', 'page_view', {
+        page_title: document.title,
+        page_location: window.location.href,
+        page_path: currentPath,
+      });
+    }
+  }, [currentPath, appData]);
 
   const navigate = (path: string) => {
     if (path.startsWith('/#')) {

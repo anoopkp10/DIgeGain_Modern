@@ -1,7 +1,7 @@
 import React from 'react';
 import { Logo } from './ui/Logo.tsx';
 import { ContactData } from '../lib/validators.ts';
-import { Phone, Mail, MapPin, Clock, ArrowUpRight, MessageCircle, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Mail, MapPin, Clock, ArrowUpRight, MessageCircle, Facebook, Instagram, Linkedin } from 'lucide-react';
 
 interface FooterProps {
   contact: ContactData;
@@ -9,7 +9,6 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
-  const cleanPhone = (contact.phone || '').replace(/[^0-9+]/g, '');
   const waUrl = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(contact.whatsappMessage || 'Hi DIGEGAIN')}`;
 
   const navLinks = [
@@ -84,16 +83,6 @@ export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
                 <MessageCircle className="w-3.5 h-3.5" />
                 <span>WhatsApp Us</span>
               </a>
-
-              {contact.phone && (
-                <a
-                  href={`tel:${cleanPhone}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border border-white/10 text-xs font-semibold tracking-wide transition-colors"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                  <span>Call Now</span>
-                </a>
-              )}
             </div>
           </div>
 

@@ -101,7 +101,7 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       color: '#A855F7',
       benefits: [
         'Strictly grounded in your verified company data (zero hallucinations)',
-        'Automatic qualification of client budgets & project scopes',
+        'Automatic qualification of client inquiries & project scopes',
         'Instant handoff to human operators on WhatsApp',
         'Omnichannel deployment for web, mobile, and social chat',
       ],

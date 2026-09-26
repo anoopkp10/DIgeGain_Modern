@@ -23,36 +23,28 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   const sizeMap = {
     sm: {
-      icon: 28,
-      gap: 'gap-1',
-      stackedFontSize: 'text-[9px]',
-      stackedTracking: 'tracking-[0.2em]',
-      stackedMargin: 'mt-0.5',
-      horizontalFontSize: 'text-lg',
+      height: 28,
+      width: 28,
+      textSize: 'text-lg',
+      gap: 'gap-2',
     },
     md: {
-      icon: 36,
-      gap: 'gap-1.5',
-      stackedFontSize: 'text-[11px]',
-      stackedTracking: 'tracking-[0.22em]',
-      stackedMargin: 'mt-1',
-      horizontalFontSize: 'text-xl',
+      height: 36,
+      width: 36,
+      textSize: 'text-2xl',
+      gap: 'gap-2.5',
     },
     lg: {
-      icon: 48,
-      gap: 'gap-2',
-      stackedFontSize: 'text-xs',
-      stackedTracking: 'tracking-[0.25em]',
-      stackedMargin: 'mt-1.5',
-      horizontalFontSize: 'text-2xl',
+      height: 48,
+      width: 48,
+      textSize: 'text-3xl',
+      gap: 'gap-3',
     },
     xl: {
-      icon: 64,
-      gap: 'gap-2.5',
-      stackedFontSize: 'text-base',
-      stackedTracking: 'tracking-[0.28em]',
-      stackedMargin: 'mt-2',
-      horizontalFontSize: 'text-4xl',
+      height: 64,
+      width: 64,
+      textSize: 'text-4xl',
+      gap: 'gap-4',
     },
   };
 
@@ -95,97 +87,92 @@ export const Logo: React.FC<LogoProps> = ({
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
       aria-label={isInteractive ? 'DIGEGAIN - Navigate to Hero' : undefined}
-      className={`${
-        layout === 'stacked'
-          ? 'inline-flex flex-col items-center justify-center text-center'
-          : `inline-flex items-center ${currentSize.gap}`
-      } select-none ${
+      className={`inline-flex items-center select-none ${
+        layout === 'stacked' ? 'flex-col items-center text-center' : 'flex-row'
+      } ${currentSize.gap} ${
         isInteractive
           ? 'cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0EA5E9] rounded-lg'
           : 'group'
       } ${className}`}
     >
-      {/* High-Fidelity SVG Ribbon Globe matching the uploaded image */}
+      {/* High-Fidelity SVG Ribbon Globe */}
       <svg
-        width={currentSize.icon}
-        height={currentSize.icon}
-        viewBox="0 0 200 200"
+        width={currentSize.width}
+        height={currentSize.height}
+        viewBox="0 0 240 240"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        onClick={isInteractive ? handleClick : undefined}
-        className={`flex-shrink-0 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-6 ${
-          isInteractive ? 'cursor-pointer' : ''
-        }`}
+        className="flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
       >
         <defs>
-          <linearGradient id="logoOrange" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F97316" />
-            <stop offset="50%" stopColor="#EA580C" />
-            <stop offset="100%" stopColor="#C2410C" />
+          <linearGradient id="logoOrangeGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+            <stop offset="0%" stopColor="#FFB300" />
+            <stop offset="60%" stopColor="#F7941D" />
+            <stop offset="100%" stopColor="#E65100" />
           </linearGradient>
-          <linearGradient id="logoBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0EA5E9" />
-            <stop offset="60%" stopColor="#0284C7" />
-            <stop offset="100%" stopColor="#0369A1" />
+          <linearGradient id="logoBlueGrad" x1="0%" y1="20%" x2="100%" y2="80%">
+            <stop offset="0%" stopColor="#29B6F6" />
+            <stop offset="50%" stopColor="#1E8FCC" />
+            <stop offset="100%" stopColor="#0277BD" />
           </linearGradient>
-          <linearGradient id="logoGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#22C55E" />
-            <stop offset="50%" stopColor="#16A34A" />
-            <stop offset="100%" stopColor="#15803D" />
+          <linearGradient id="logoGreenGrad" x1="10%" y1="0%" x2="90%" y2="100%">
+            <stop offset="0%" stopColor="#81C784" />
+            <stop offset="50%" stopColor="#4CAF50" />
+            <stop offset="100%" stopColor="#2E7D32" />
           </linearGradient>
-          <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#0284C7" floodOpacity="0.35" />
-          </filter>
+          <linearGradient id="logoYellowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFE082" />
+            <stop offset="100%" stopColor="#FFA000" />
+          </linearGradient>
         </defs>
 
-        <g transform="translate(100, 100) scale(0.85)">
-          {/* Top Yellow-Orange Ribbon */}
+        <g transform="translate(120, 120)">
+          {/* Top Yellow/Amber Tip Ribbon */}
           <path
-            d="M -30 -85 C -10 -92, 25 -88, 52 -72 C 32 -65, 8 -70, -22 -66 C -35 -72, -40 -80, -30 -85 Z"
-            fill="#F97316"
+            d="M -30 -90 C -10 -95, 20 -92, 45 -78 C 30 -70, 10 -75, -20 -72 C -32 -76, -38 -84, -30 -90 Z"
+            fill="url(#logoYellowGrad)"
           />
-          {/* Main Orange Swirl Ribbon */}
+          {/* Top-Mid Orange Main Ribbon */}
           <path
-            d="M -80 -42 C -72 -68, -32 -90, 22 -85 C 72 -78, 92 -45, 80 -15 C 62 -4, 38 -12, 18 -22 C -30 -40, -62 -32, -80 -42 Z"
-            fill="url(#logoOrange)"
+            d="M -75 -48 C -70 -72, -35 -92, 15 -88 C 65 -82, 85 -50, 75 -22 C 60 -12, 40 -20, 20 -28 C -25 -45, -55 -40, -75 -48 Z"
+            fill="url(#logoOrangeGrad)"
           />
-          {/* Upper Azure Blue Arc */}
+          {/* Upper Blue Ribbon Arch */}
           <path
-            d="M -92 -5 C -90 -28, -50 -55, 15 -50 C 68 -48, 98 -16, 96 20 C 78 22, 52 12, 22 -2 C -25 -20, -68 -5, -92 -5 Z"
-            fill="url(#logoBlue)"
+            d="M -85 -10 C -85 -30, -50 -55, 10 -52 C 60 -50, 92 -20, 95 15 C 80 18, 55 10, 25 -2 C -20 -18, -60 -5, -85 -10 Z"
+            fill="url(#logoBlueGrad)"
           />
-          {/* Middle Deep Blue Swirling Ribbon */}
+          {/* Center Royal Blue Sweeping Band */}
           <path
-            d="M -96 22 C -92 2, -60 -22, -8 -18 C 50 -12, 92 12, 98 42 C 75 48, 32 32, -18 18 C -60 8, -84 24, -96 22 Z"
-            fill="#0369A1"
+            d="M -92 18 C -90 -2, -60 -25, -10 -22 C 45 -18, 88 5, 96 35 C 75 42, 35 30, -15 15 C -55 5, -80 20, -92 18 Z"
+            fill="#1565C0"
           />
-          {/* Lower Vibrant Green Swirl */}
+          {/* Vibrant Emerald-Green Rising Ribbon */}
           <path
-            d="M -85 50 C -68 22, -18 8, 35 22 C 82 35, 98 68, 72 90 C 50 85, 18 70, -28 52 C -60 40, -80 52, -85 50 Z"
-            fill="url(#logoGreen)"
+            d="M -80 45 C -65 20, -20 5, 30 18 C 75 30, 95 62, 70 85 C 50 82, 20 68, -25 50 C -55 38, -75 48, -80 45 Z"
+            fill="url(#logoGreenGrad)"
           />
-          {/* Bottom Accent Green Tip */}
+          {/* Lower Leaf Accent Ribbon */}
           <path
-            d="M -50 82 C -22 68, 18 65, 60 80 C 65 86, 45 96, 8 94 C -28 92, -46 88, -50 82 Z"
-            fill="#15803D"
+            d="M -50 78 C -25 65, 15 62, 55 75 C 62 82, 45 92, 10 90 C -25 88, -45 84, -50 78 Z"
+            fill="#66BB6A"
           />
         </g>
       </svg>
 
       {/* Brand Wordmark "DIGEGAIN" */}
-      {(variant === 'full' && showText) && (
+      {variant === 'full' && showText && (
         <span
           onClick={isInteractive ? handleClick : undefined}
           data-cursor="pointer"
           className={`font-heading font-black uppercase select-none transition-colors duration-200 leading-none ${
-            isInteractive ? 'cursor-pointer' : ''
-          } ${
             layout === 'stacked'
-              ? `${currentSize.stackedFontSize} ${currentSize.stackedTracking} ${currentSize.stackedMargin}`
-              : `${currentSize.horizontalFontSize} tracking-tight`
-          } ${
-            textColor ||
-            'text-[#0EA5E9] group-hover:text-[#38BDF8]'
+              ? 'mt-2 text-center tracking-widest'
+              : 'tracking-wider'
+          } ${currentSize.textSize} ${
+            textColor
+              ? textColor
+              : 'text-transparent bg-clip-text bg-gradient-to-r from-[#1E8FCC] to-[#29B6F6] group-hover:from-[#29B6F6] group-hover:to-[#38BDF8]'
           }`}
         >
           DIGEGAIN

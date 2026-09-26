@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
+import { trackConversion } from '../lib/analytics.ts';
 
 interface WhatsAppFabProps {
   whatsappNumber: string;
@@ -23,6 +24,7 @@ export const WhatsAppFab: React.FC<WhatsAppFabProps> = ({
         href={waUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackConversion('whatsapp_click', { source: 'floating_fab' })}
         data-cursor-label="Chat"
         className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#25D366]/50"
         aria-label="Chat with DIGEGAIN on WhatsApp"
