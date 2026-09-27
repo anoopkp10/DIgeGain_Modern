@@ -18,6 +18,9 @@ $configFile = __DIR__ . '/config.php';
 $config = file_exists($configFile) ? require $configFile : [];
 if (!is_array($config)) $config = [];
 
+// Load PHPMailer Helper
+require_once __DIR__ . '/mailer.php';
+
 $geminiApiKey = $config['GEMINI_API_KEY'] ?? getenv('GEMINI_API_KEY') ?: '';
 $adminUser    = $config['ADMIN_USERNAME'] ?? getenv('ADMIN_USERNAME') ?: 'admin';
 $adminPass    = $config['ADMIN_PASSWORD'] ?? getenv('ADMIN_PASSWORD') ?: 'Digegain@2026!';
@@ -221,45 +224,53 @@ if (($route === 'contact-form' || $route === 'contact') && $method === 'POST') {
             'error' => ''
         ]
     ];
-    array_unshift($appData['leads'], $leadRecord);
-    saveAppData($dataPath, $appData);
+    $host = $_SERVER['HTTP_HOST'] ?? 'digegain.com';
+    $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
 
-    // Send Admin Notification Email via Hostinger PHP mail
+    // 1. Send Admin Notification Email via PHPMailer
     $adminTo = $notifyEmail ?: ($appData['contact']['email'] ?? 'anoopkp10@gmail.com');
     $adminSub = "New Inquiry from DIGEGAIN: " . strip_tags($name) . " (" . strip_tags($service) . ")";
-    $adminMsg = "New Lead Captured from DIGEGAIN Website:\n\n"
-              . "Name: $name\n"
-              . "Email: $email\n"
-              . "Phone / WhatsApp: $phone\n"
-              . "Service: $service\n"
-              . "Source: $source\n"
-              . "Date: " . date('Y-m-d H:i:s T') . "\n\n"
-              . "Client Requirements / Message:\n$message\n\n"
-              . "WhatsApp direct link: https://wa.me/" . preg_replace('/[^0-9]/', '', $phone) . "\n";
+    $adminPlain = "New Lead Captured from DIGEGAIN Website:\n\n"
+                . "Name: $name\n"
+                . "Email: $email\n"
+                . "Phone / WhatsApp: $phone\n"
+                . "Service: $service\n"
+                . "Source: $source\n"
+                . "Date: " . date('Y-m-d H:i:s T') . "\n\n"
+                . "Client Requirements / Message:\n$message\n\n"
+                . "WhatsApp direct link: https://wa.me/$cleanPhone\n";
+    $adminHtml = buildAdminLeadEmailHtml($leadRecord, $host, $cleanPhone);
+    $adminResult = sendDigegainEmail($config, $adminTo, $adminSub, $adminHtml, $adminPlain, $email, $name);
 
-    $host = $_SERVER['HTTP_HOST'] ?? 'digegain.com';
-    $headers = [
-        "From: DIGEGAIN Lead System <no-reply@$host>",
-        "Reply-To: $email",
-        "X-Mailer: PHP/" . phpversion()
-    ];
-    @mail($adminTo, $adminSub, $adminMsg, implode("\r\n", $headers));
-
-    // Send confirmation to client
+    // 2. Send Client Confirmation Email via PHPMailer
     $clientSub = "We have received your project inquiry - DIGEGAIN";
-    $clientMsg = "Hello $name,\n\n"
-               . "Thank you for contacting DIGEGAIN. We have received your inquiry for $service.\n"
-               . "Our technical team is reviewing your requirements and will reach out within 24 hours.\n\n"
-               . "Need immediate assistance?\n"
-               . "WhatsApp: https://wa.me/" . ($appData['contact']['whatsappNumber'] ?? '919847012345') . "\n\n"
-               . "Best regards,\nDIGEGAIN Team\nhttps://$host\n";
-    @mail($email, $clientSub, $clientMsg, implode("\r\n", ["From: DIGEGAIN <no-reply@$host>", "X-Mailer: PHP/" . phpversion()]));
+    $whatsapp = $appData['contact']['whatsappNumber'] ?? '919847012345';
+    $clientPlain = "Hello $name,\n\n"
+                 . "Thank you for contacting DIGEGAIN. We have received your inquiry for $service.\n"
+                 . "Our technical team is reviewing your requirements and will reach out within 24 hours.\n\n"
+                 . "Need immediate assistance?\n"
+                 . "WhatsApp: https://wa.me/" . preg_replace('/[^0-9]/', '', $whatsapp) . "\n\n"
+                 . "Best regards,\nDIGEGAIN Team\nhttps://$host\n";
+    $clientHtml = buildClientConfirmationEmailHtml($name, $service, $host, $whatsapp);
+    $clientResult = sendDigegainEmail($config, $email, $clientSub, $clientHtml, $clientPlain);
+
+    // Update email status on lead
+    $leadRecord['emailStatus']['adminNotification'] = !empty($adminResult['ok']) ? 'sent' : 'failed';
+    $leadRecord['emailStatus']['clientConfirmation'] = !empty($clientResult['ok']) ? 'sent' : 'failed';
+    $leadRecord['emailStatus']['transport'] = $adminResult['transport'] ?? 'unknown';
+    if (!empty($adminResult['error'])) {
+        $leadRecord['emailStatus']['error'] = $adminResult['error'];
+    }
+
+    array_unshift($appData['leads'], $leadRecord);
+    saveAppData($dataPath, $appData);
 
     jsonResponse([
         'ok' => true,
         'success' => true,
         'message' => 'Thank you! Your project inquiry has been received. Our team will contact you within 24 hours.',
-        'leadId' => $leadId
+        'leadId' => $leadId,
+        'emailStatus' => $leadRecord['emailStatus']
     ]);
 }
 
@@ -452,6 +463,37 @@ if ($isAdminRoute) {
         jsonResponse(['ok' => true, 'message' => 'Lead deleted']);
     }
 
+    // POST /api/admin/leads/{id}/resend
+    if (preg_match('#^leads/([^/]+)/resend$#', $subRoute, $matches) && $method === 'POST') {
+        $leadId = $matches[1];
+        $targetLead = null;
+        foreach ($appData['leads'] as &$l) {
+            if ($l['id'] === $leadId) {
+                $targetLead = &$l;
+                break;
+            }
+        }
+        if (!$targetLead) {
+            jsonResponse(['error' => 'Lead not found'], 404);
+        }
+
+        $host = $_SERVER['HTTP_HOST'] ?? 'digegain.com';
+        $adminTo = $notifyEmail ?: ($appData['contact']['email'] ?? 'anoopkp10@gmail.com');
+        $adminSub = "[Resent] Inquiry: " . strip_tags($targetLead['name']) . " (" . strip_tags($targetLead['service'] ?? 'General') . ")";
+        $cleanPhone = preg_replace('/[^0-9]/', '', $targetLead['phone'] ?? '');
+        $adminHtml = buildAdminLeadEmailHtml($targetLead, $host, $cleanPhone);
+        $res = sendDigegainEmail($config, $adminTo, $adminSub, $adminHtml, '', $targetLead['email'] ?? '', $targetLead['name'] ?? '');
+
+        if ($res['ok']) {
+            $targetLead['emailStatus']['adminNotification'] = 'sent';
+            $targetLead['emailStatus']['transport'] = $res['transport'] ?? 'phpmailer';
+            saveAppData($dataPath, $appData);
+            jsonResponse(['success' => true, 'message' => 'Lead notification email resent successfully', 'transport' => $res['transport']]);
+        } else {
+            jsonResponse(['error' => 'Failed to send email: ' . ($res['error'] ?? 'Unknown error')], 500);
+        }
+    }
+
     // PUT /api/admin/contact
     if ($subRoute === 'contact' && $method === 'PUT') {
         $raw = file_get_contents('php://input');
@@ -568,9 +610,21 @@ if ($isAdminRoute) {
     if ($subRoute === 'test-email' && $method === 'POST') {
         $testTo = $notifyEmail ?: 'anoopkp10@gmail.com';
         $host = $_SERVER['HTTP_HOST'] ?? 'digegain.com';
-        $headers = "From: DIGEGAIN Test <no-reply@$host>\r\nReply-To: $testTo\r\nX-Mailer: PHP/" . phpversion();
-        $sent = @mail($testTo, "DIGEGAIN Hostinger Test Email", "Hostinger PHP mail is working successfully!", $headers);
-        jsonResponse(['success' => $sent, 'sentTo' => $testTo]);
+        $sub = "PHPMailer Test Email - DIGEGAIN Hostinger System";
+        $html = "<div style='font-family: sans-serif; padding: 20px; background: #0f172a; color: #f8fafc; border-radius: 8px;'>"
+              . "<h2 style='color: #38bdf8;'>DIGEGAIN PHPMailer Test Successful!</h2>"
+              . "<p>Your email system on Hostinger is properly configured and communicating with SMTP.</p>"
+              . "<p style='color: #94a3b8; font-size: 13px;'>Server Host: " . htmlspecialchars($host) . "<br>Timestamp: " . date('Y-m-d H:i:s T') . "</p>"
+              . "</div>";
+        $plain = "DIGEGAIN PHPMailer Test Successful!\nYour email system on Hostinger is properly configured and working.";
+
+        $result = sendDigegainEmail($config, $testTo, $sub, $html, $plain);
+        jsonResponse([
+            'success'   => !empty($result['ok']),
+            'sentTo'    => $testTo,
+            'transport' => $result['transport'] ?? 'unknown',
+            'error'     => $result['error'] ?? null
+        ]);
     }
 }
 

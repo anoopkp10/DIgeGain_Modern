@@ -1,0 +1,25 @@
+# DIGEGAIN
+> AI-powered digital growth company building bespoke web systems for service businesses.
+
+## Overview
+DIGEGAIN engineers high-performance web systems, booking platforms, contactless order engines, interactive portfolios, and business dashboards. We cater to clinics, salons, restaurants, agencies, consultants, and service enterprises looking for modern UX, high conversion rates, and automated operational efficiency.
+
+## Core Capabilities & Services
+- Booking & Appointment Systems: Multi-specialty outpatient scheduling, barber/salon stylist booking, WhatsApp automated reminders, calendar sync, deposit payments.
+- Order & E-commerce Management Systems: QR table ordering, live Kitchen Display Systems (KDS), automated commercial invoicing, batch delivery logistics.
+- Portfolio & Listing Websites: WebGL 3D showcases, fluid image distortion, GSAP motion, high-speed Core Web Vitals performance.
+- Admin Dashboards & Analytics: Multi-tenant telemetry, operational metrics, predictive AI anomaly detection, role-based access.
+- AI Chatbots & Customer Automation: Grounded generative conversational assistants, automated lead qualification, WhatsApp Business API integrations.
+- SEO / AEO / GEO: Schema markup, Answer Engine Optimization (Perplexity, ChatGPT Search), fast-loading semantic HTML.
+
+## Key Links
+- Homepage: https://digegain.com/
+- Portfolio Showcase: https://digegain.com/portfolio
+- Contact & Inquiries: https://digegain.com/contact
+- WhatsApp Channel: https://wa.me/919847012345
+
+## Headquarters & Contact
+- Email: hello@digergain.com
+- Phone: +91 98470 12345
+- Address: Infopark Phase 2, Kakkanad, Kochi, Kerala, IN (PIN: 682042)
+- Operating Hours: Mon–Sat (09:00 - 18:00)

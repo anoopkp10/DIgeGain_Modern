@@ -1,0 +1,66 @@
+# DIGEGAIN - Complete Technical & Business Knowledge Base
+
+## Brand Entity
+Company Name: DIGEGAIN
+Status: AI-Powered Digital Growth Company
+Specialization: Web applications, booking systems, order engines, admin dashboards, AI workflows for service businesses.
+
+## Contact Information
+- Direct Email: hello@digergain.com
+- Phone: +91 98470 12345
+- WhatsApp Number: +919847012345
+- Corporate Address: Infopark Phase 2, Kakkanad, Kochi, Kerala, IN
+- Latitude: 9.9984, Longitude: 76.3575
+
+## Verified Portfolio Case Studies
+### PulseCare AI Clinic Booking & Patient Portal
+Category: Booking System
+Client: PulseCare Healthcare Network
+Tags: TypeScript, React, WhatsApp API, PostgreSQL, Healthcare
+URL: https://pulsecare.example.com
+Description: Outpatient scheduling system with automated slot allocation, doctor multi-roster synchronization, and real-time WhatsApp appointment reminders.
+
+### BistroFlow Real-Time Kitchen Display & Order Engine
+Category: Order System
+Client: BistroFlow Hospitality
+Tags: React, WebSockets, Node.js, KDS, Hospitality
+URL: https://bistroflow.example.com
+Description: Contactless QR dining and live kitchen display system (KDS) synchronizing table orders, split bills, and live kitchen dispatch in under 200ms.
+
+### Apex Studio Immersive Showcase & Client Funnel
+Category: Portfolio Website
+Client: Apex Design Architecture
+Tags: WebGL, Three.js, Tailwind CSS, AEO, Creative
+URL: https://apexdesign.example.com
+Description: Ultra-fast WebGL portfolio featuring fluid cursor interactions, dynamic case-study presentations, and automated inquiry pipeline routing.
+
+### OmniMetric Executive Operational Analytics Dashboard
+Category: Dashboard
+Client: OmniMetric Global
+Tags: React, TypeScript, DataViz, Node.js, Enterprise
+URL: https://omnimetric.example.com
+Description: Real-time unified BI dashboard providing revenue forecasting, staff capacity analytics, automated invoicing, and role-based access control.
+
+### LuxeSalon Stylist Roster & VIP Booking Web App
+Category: Booking System
+Client: LuxeSalon & Spa
+Tags: React, Mobile First, WhatsApp Reminders, Stripe, Salon
+URL: https://luxesalon.example.com
+Description: Dedicated beauty suite booking engine with stylist preference selection, automated package upselling, and deposit payment processing.
+
+### Artisan B2B Wholesale Ordering & Inventory Portal
+Category: Order System
+Client: Artisan Bakery Works
+Tags: Next.js, Node.js, B2B Commerce, Automated Billing
+URL: https://artisan.example.com
+Description: Wholesale ordering platform with tiered merchant pricing, automated recurring delivery schedules, and GST-compliant invoice generation.
+
+
+## Frequently Asked Questions (AEO Grounding)
+
+
+## Architectural Standards
+- Modern TypeScript, React, Tailwind CSS, Express backend.
+- GSAP and WebGL canvas acceleration for smooth interactive dynamics.
+- Zero client-side API key exposure.
+- Server-side atomic JSON persistence with lock guarantees.

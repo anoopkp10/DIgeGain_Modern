@@ -63,28 +63,41 @@ if (empty($message) || strlen($message) < 5) {
     exit;
 }
 
-// Recipient email - configure your receiving email here
-$to = 'anoopkp10@gmail.com'; 
+$configFile = __DIR__ . '/config.php';
+$config = file_exists($configFile) ? require $configFile : [];
+if (!is_array($config)) $config = [];
+require_once __DIR__ . '/mailer.php';
+
+$host = $_SERVER['HTTP_HOST'] ?? 'digegain.com';
+$cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+$to = $config['NOTIFY_EMAIL'] ?? 'anoopkp10@gmail.com'; 
 $subject = "New Inquiry from DIGEGAIN Website: " . strip_tags($name);
 
-$body = "New Lead Received from DIGEGAIN Website:\n\n";
-$body .= "Name: " . $name . "\n";
-$body .= "Email: " . $email . "\n";
-$body .= "Phone / WhatsApp: " . $phone . "\n";
-$body .= "Service: " . $service . "\n";
-$body .= "Date: " . date('Y-m-d H:i:s') . " UTC\n\n";
-$body .= "Requirements / Project Details:\n" . $message . "\n";
+$leadRecord = [
+    'name' => $name,
+    'email' => $email,
+    'phone' => $phone,
+    'service' => $service,
+    'source' => 'contact-page',
+    'message' => $message,
+];
 
-$headers = [];
-$headers[] = 'From: DIGEGAIN Notifications <no-reply@' . ($_SERVER['HTTP_HOST'] ?? 'digegain.com') . '>';
-$headers[] = 'Reply-To: ' . $email;
-$headers[] = 'X-Mailer: PHP/' . phpversion();
+$plain = "New Lead Received from DIGEGAIN Website:\n\n"
+       . "Name: $name\n"
+       . "Email: $email\n"
+       . "Phone / WhatsApp: $phone\n"
+       . "Service: $service\n"
+       . "Date: " . date('Y-m-d H:i:s') . " UTC\n\n"
+       . "Requirements / Project Details:\n$message\n"
+       . "WhatsApp: https://wa.me/$cleanPhone\n";
 
-$mailSent = @mail($to, $subject, $body, implode("\r\n", $headers));
+$html = buildAdminLeadEmailHtml($leadRecord, $host, $cleanPhone);
+$mailResult = sendDigegainEmail($config, $to, $subject, $html, $plain, $email, $name);
 
 http_response_code(200);
 echo json_encode([
     'ok' => true,
     'message' => 'Thank you! Your project inquiry has been received. Our team will contact you shortly.',
-    'mailSent' => $mailSent
+    'mailSent' => !empty($mailResult['ok']),
+    'transport' => $mailResult['transport'] ?? 'unknown'
 ]);

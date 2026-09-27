@@ -1,0 +1,26 @@
+# Robots.txt for DIGEGAIN
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# AI Crawlers & LLM Agents
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://digegain.com/sitemap.xml
