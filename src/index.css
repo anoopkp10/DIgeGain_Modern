@@ -134,3 +134,59 @@
 .animate-voice-ripple {
   animation: voice-ripple 1.8s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
 }
+
+html.light body {
+  background: #f6faff !important;
+  color: #0b1b2e !important;
+}
+
+html.light body [class*="bg-[#060D1A]"],
+html.light body [class*="bg-[#050A14]"],
+html.light body [class*="bg-[#040812]"],
+html.light body [class*="bg-[#03060D]"],
+html.light body [class*="bg-[#0f172a]"],
+html.light body [class*="bg-[#1e293b]"] {
+  background-color: #ffffff !important;
+}
+
+html.light body [class*="bg-[#081524]"],
+html.light body [class*="bg-[#0b1b2e]"],
+html.light body [class*="bg-[#10243d]"] {
+  background-color: #edf4fa !important;
+}
+
+html.light body .glass-panel {
+  background-color: rgba(255, 255, 255, 0.88);
+  border-color: rgba(15, 42, 67, 0.12);
+  box-shadow: 0 12px 30px -18px rgba(15, 42, 67, 0.25);
+}
+
+html.light body [class~="text-white"],
+html.light body [class~="text-slate-200"],
+html.light body [class~="text-slate-300"] {
+  color: #0b1b2e !important;
+}
+
+html.light body [class~="text-slate-400"],
+html.light body [class~="text-slate-500"] {
+  color: #475569 !important;
+}
+
+html.light body [class*="bg-gradient-to-r"][class~="text-white"],
+html.light body [class*="bg-gradient-to-tr"][class~="text-white"],
+html.light body [class*="bg-gradient-to-r"] [class~="text-white"],
+html.light body [class*="bg-gradient-to-tr"] [class~="text-white"] {
+  color: #ffffff !important;
+}
+
+html.light body [class*="border-white/"] {
+  border-color: rgba(15, 42, 67, 0.12) !important;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #e8eff6;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+}

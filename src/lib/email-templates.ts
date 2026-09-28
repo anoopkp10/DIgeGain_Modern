@@ -83,7 +83,7 @@ WhatsApp: ${waUrl}
 
 Best regards,
 DIGEGAIN Team
-https://digergain.com
+https://digegain.com
 `;
 
   return { html, text };

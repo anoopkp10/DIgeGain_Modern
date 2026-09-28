@@ -194,7 +194,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         throw new Error(errData.error || 'Project save failed');
       }
 
-      const updatedItem = await res.json();
+      const result = await res.json();
+      const updatedItem = result.item || result;
 
       setAppData(prev => {
         const nextList = editingItem
@@ -470,7 +471,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         credentials: 'include',
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Test email failed');
+      if (!res.ok) throw new Error(data.error || data.message || 'Test email failed');
       showToast('Test email sent! Check recipient inbox.');
     } catch (err: any) {
       showToast(err.message, 'error');

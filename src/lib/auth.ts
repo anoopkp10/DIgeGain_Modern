@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 
 const SESSION_SECRET = new TextEncoder().encode(
-  process.env.SESSION_SECRET || 'digegain-super-secure-jwt-key-2026-production-token'
+  process.env.SESSION_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'local-development-session-secret')
 );
 
 const COOKIE_NAME = 'digegain_admin_session';
@@ -27,8 +27,8 @@ export async function verifySessionToken(token: string): Promise<{ valid: boolea
 }
 
 export function validateAdminCredentials(user: string, pass: string): boolean {
-  const expectedUser = process.env.ADMIN_USERNAME || 'admin';
-  const expectedPass = process.env.ADMIN_PASSWORD || 'Digegain@2026!';
+  const expectedUser = process.env.ADMIN_USERNAME || (process.env.NODE_ENV === 'production' ? '' : 'admin');
+  const expectedPass = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === 'production' ? '' : 'Digegain@2026!');
   return user === expectedUser && pass === expectedPass;
 }
 

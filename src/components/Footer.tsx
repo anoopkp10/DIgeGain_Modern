@@ -18,7 +18,6 @@ export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
     { label: 'Client Portfolio', path: '/portfolio' },
     { label: 'Engineering Process', path: '/#process' },
     { label: 'Contact & Consultation', path: '/contact' },
-    { label: 'Admin Portal', path: '/admin' },
   ];
 
   const servicesList = [
@@ -151,7 +150,7 @@ export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
               <div className="text-xs font-mono text-slate-500 uppercase tracking-wider mb-2">Connect</div>
               <div className="flex items-center gap-2.5">
                 <a
-                  href={contact.socials?.facebook || 'https://facebook.com/digergain'}
+                  href={contact.socials?.facebook || 'https://facebook.com/digegain'}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Follow DIGEGAIN on Facebook"
@@ -162,7 +161,7 @@ export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
                 </a>
 
                 <a
-                  href={contact.socials?.instagram || 'https://instagram.com/digergain'}
+                  href={contact.socials?.instagram || 'https://instagram.com/digegain'}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Follow DIGEGAIN on Instagram"
@@ -173,7 +172,7 @@ export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
                 </a>
 
                 <a
-                  href={contact.socials?.linkedin || 'https://linkedin.com/company/digergain'}
+                  href={contact.socials?.linkedin || 'https://linkedin.com/company/digegain'}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Connect with DIGEGAIN on LinkedIn"
@@ -199,12 +198,6 @@ export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
             <button onClick={() => onNavigate('/contact')} className="hover:text-slate-300 transition-colors">
               Terms of Service
             </button>
-            <a href="/sitemap.xml" target="_blank" className="hover:text-slate-300 transition-colors">
-              Sitemap
-            </a>
-            <a href="/llms.txt" target="_blank" className="hover:text-slate-300 transition-colors font-mono">
-              /llms.txt
-            </a>
           </div>
         </div>
       </div>

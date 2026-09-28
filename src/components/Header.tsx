@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Logo } from './ui/Logo.tsx';
 import { MagneticButton } from './ui/MagneticButton.tsx';
-import { Menu, X, Sun, Moon, Sparkles, Volume2, VolumeX, ArrowUpRight } from 'lucide-react';
+import { Menu, X, Sun, Moon, ArrowUpRight } from 'lucide-react';
 
 interface HeaderProps {
   currentPath: string;
@@ -12,9 +12,25 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [activePath, setActivePath] = useState('/');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLight, setIsLight] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [isLight, setIsLight] = useState(() => {
+    try {
+      return localStorage.getItem('digegain-theme') === 'light';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', isLight);
+    document.documentElement.classList.toggle('dark', !isLight);
+    try {
+      localStorage.setItem('digegain-theme', isLight ? 'light' : 'dark');
+    } catch {
+      // Theme still applies for this page view when storage is unavailable.
+    }
+  }, [isLight]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,18 +60,31 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY, mobileMenuOpen]);
 
-  const toggleTheme = () => {
-    setIsLight(prev => {
-      const next = !prev;
-      if (next) {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-      } else {
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
+  useEffect(() => {
+    const updateActivePath = () => {
+      if (currentPath !== '/') {
+        setActivePath(currentPath);
+        return;
       }
-      return next;
-    });
+
+      const sectionIds = ['hero', 'about', 'services', 'process'];
+      const activeSection = sectionIds.reduce((activeId, id) => {
+        const section = document.getElementById(id);
+        return section && section.getBoundingClientRect().top <= window.innerHeight * 0.35
+          ? id
+          : activeId;
+      }, 'hero');
+
+      setActivePath(activeSection === 'hero' ? '/' : `/#${activeSection}`);
+    };
+
+    updateActivePath();
+    window.addEventListener('scroll', updateActivePath, { passive: true });
+    return () => window.removeEventListener('scroll', updateActivePath);
+  }, [currentPath]);
+
+  const toggleTheme = () => {
+    setIsLight(prev => !prev);
   };
 
   const navLinks = [
@@ -69,6 +98,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
 
   const handleLinkClick = (path: string) => {
     setMobileMenuOpen(false);
+    setActivePath(path);
     onNavigate(path);
   };
 
@@ -121,25 +151,22 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
           {/* Desktop Navigation Links with Emotion Agency Rolling Text Hover */}
           <nav className="hidden lg:flex items-center gap-8" aria-label="Main Navigation">
             {navLinks.map(link => {
-              const isActive = currentPath === link.path;
+              const isActive = activePath === link.path;
               return (
                 <button
                   key={link.path}
                   onClick={() => handleLinkClick(link.path)}
-                  className="group relative py-1 text-sm font-medium tracking-wide text-slate-300 hover:text-white transition-colors overflow-hidden"
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`relative py-2 text-sm font-medium tracking-wide transition-colors ${
+                    isActive ? 'text-[#0EA5E9]' : 'text-slate-300 hover:text-[#16A34A]'
+                  }`}
                 >
-                  <div className="flex flex-col transition-transform duration-300 ease-out group-hover:-translate-y-full">
-                    <span className="block h-5 leading-5">{link.label}</span>
-                    <span className="block h-5 leading-5 text-transparent bg-clip-text bg-gradient-to-r from-[#0EA5E9] to-[#16A34A] font-semibold">
-                      {link.label}
-                    </span>
-                  </div>
-                  {/* Subtle hover gradient sweep */}
                   <span
-                    className={`absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-[#EA580C] via-[#0284C7] to-[#16A34A] transition-transform duration-300 origin-left ${
-                      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    className={`absolute bottom-0 left-0 h-[2px] w-full transition-colors ${
+                      isActive ? 'bg-[#0EA5E9]' : 'bg-transparent'
                     }`}
                   />
+                  {link.label}
                 </button>
               );
             })}
@@ -151,19 +178,11 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
             <button
               onClick={toggleTheme}
               className="p-2.5 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
-              aria-label="Toggle light/dark theme"
+              aria-label={isLight ? 'Switch to dark theme' : 'Switch to light theme'}
+              aria-pressed={isLight}
+              title={isLight ? 'Switch to dark theme' : 'Switch to light theme'}
             >
               {isLight ? <Moon className="w-4 h-4 text-slate-800" /> : <Sun className="w-4 h-4 text-amber-400" />}
-            </button>
-
-            {/* Sound Toggle (for ambient interaction click) */}
-            <button
-              onClick={() => setSoundEnabled(prev => !prev)}
-              className="p-2.5 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
-              aria-label="Toggle sound effects"
-              title={soundEnabled ? 'Sound enabled' : 'Sound muted'}
-            >
-              {soundEnabled ? <Volume2 className="w-4 h-4 text-[#0EA5E9]" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
             </button>
 
             {/* Magnetic CTA */}
@@ -171,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
               onClick={() => handleLinkClick('/contact')}
               className="relative px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide text-white bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] hover:shadow-lg hover:shadow-[#0284C7]/40 active:scale-95 transition-all flex items-center gap-2 group"
             >
-              <span>Let's talk</span>
+              <span>Let's connect</span>
               <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </MagneticButton>
           </div>
@@ -181,7 +200,9 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
             <button
               onClick={toggleTheme}
               className="p-2 text-slate-300 hover:text-white"
-              aria-label="Theme toggle"
+              aria-label={isLight ? 'Switch to dark theme' : 'Switch to light theme'}
+              aria-pressed={isLight}
+              title={isLight ? 'Switch to dark theme' : 'Switch to light theme'}
             >
               {isLight ? <Moon className="w-5 h-5 text-slate-800" /> : <Sun className="w-5 h-5 text-amber-400" />}
             </button>
@@ -209,14 +230,16 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
           <div className="text-xs font-mono tracking-widest text-[#0EA5E9] uppercase">
             NAVIGATION
           </div>
-          {navLinks.map((link, idx) => (
+          {navLinks.map(link => (
             <button
               key={link.path}
               onClick={() => handleLinkClick(link.path)}
-              className="flex items-center justify-between text-left text-3xl font-heading font-bold text-white hover:text-[#0EA5E9] transition-colors py-2 border-b border-white/5"
+              aria-current={activePath === link.path ? 'page' : undefined}
+              className={`flex items-center justify-between text-left text-3xl font-heading font-bold transition-colors py-2 border-b border-white/5 ${
+                activePath === link.path ? 'text-[#0EA5E9]' : 'text-white hover:text-[#16A34A]'
+              }`}
             >
               <span>{link.label}</span>
-              <span className="font-mono text-xs text-slate-500">0{idx + 1}</span>
             </button>
           ))}
         </div>
@@ -230,7 +253,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
           </button>
           <div className="flex items-center justify-between text-xs text-slate-400">
             <span>© DIGEGAIN</span>
-            <span>hello@digergain.com</span>
+            <span>hello@digegain.com</span>
           </div>
         </div>
       </div>

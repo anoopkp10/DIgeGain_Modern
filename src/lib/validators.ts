@@ -31,7 +31,7 @@ export const ContactGeoSchema = z.object({
 export const ContactSchema = z.object({
   companyName: z.string().default('DIGEGAIN'),
   tagline: z.string().default('AI-Powered Web Systems & Digital Growth'),
-  email: z.string().email().or(z.string()).default('hello@digergain.com'),
+  email: z.string().email().or(z.string()).default('hello@digegain.com'),
   phone: z.string().default(''),
   whatsappNumber: z.string().regex(/^\d*$/, 'Only digits allowed, no +').default(''),
   whatsappMessage: z.string().default("Hi DIGEGAIN, I'd like to discuss a project."),
@@ -115,7 +115,7 @@ export const AssistantSchema = z.object({
 
 export const SettingsSchema = z.object({
   notifyEmail: z.string().email().or(z.string()).default('anoopkp10@gmail.com'),
-  siteUrl: z.string().default('https://digergain.com'),
+  siteUrl: z.string().default('https://digegain.com'),
 });
 
 export const AppDataSchema = z.object({

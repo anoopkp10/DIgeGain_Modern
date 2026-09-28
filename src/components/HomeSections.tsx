@@ -155,7 +155,6 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
   const stats = [
     { value: '99.8%', label: 'Uptime Architecture', sub: 'High reliability SLA' },
     { value: '40%+', label: 'Operational Efficiency', sub: 'Average client labor saved' },
-    { value: '50+', label: 'Delivered Web Systems', sub: 'Clinics, salons & dining' },
     { value: '14 Days', label: 'Rapid Sprint Delivery', sub: 'From blueprint to live launch' },
   ];
 
@@ -219,12 +218,10 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       {/* ═══════════════════════════════════════════════
           ABOUT SECTION
       ═══════════════════════════════════════════════ */}
-      <section id="about" className="relative py-28 px-6 sm:px-8 border-t border-white/5 bg-[#050A14]">
+      <section id="about" className="relative py-20 px-6 sm:px-8 border-t border-white/5 bg-[#050A14]">
         <div className="max-w-7xl mx-auto">
           {/* Section Kicker */}
           <div className="flex items-center gap-2 font-mono text-xs text-[#0EA5E9] uppercase tracking-widest mb-4">
-            <span>(001)</span>
-            <span aria-hidden="true">·</span>
             <span>About DIGEGAIN</span>
           </div>
 
@@ -288,13 +285,11 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       {/* ═══════════════════════════════════════════════
           SERVICES SECTION
       ═══════════════════════════════════════════════ */}
-      <section id="services" className="relative py-28 px-6 sm:px-8 bg-[#060D1A]">
+      <section id="services" className="relative py-20 px-6 sm:px-8 bg-[#060D1A]">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2 font-mono text-xs text-[#16A34A] uppercase tracking-widest">
-                <span>(002)</span>
-                <span aria-hidden="true">·</span>
                 <span>Core Capabilities</span>
               </div>
               <h2 className="text-3xl sm:text-5xl font-heading font-extrabold text-white tracking-tight">
@@ -323,9 +318,6 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
                       >
                         <Icon className="w-6 h-6" style={{ color: s.color }} />
                       </div>
-                      <span className="font-mono text-xs text-slate-500 font-bold">
-                        ({s.number})
-                      </span>
                     </div>
 
                     <div className="space-y-2">
@@ -372,12 +364,10 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       {/* ═══════════════════════════════════════════════
           PROCESS SPRINT SECTION
       ═══════════════════════════════════════════════ */}
-      <section id="process" className="relative py-28 px-6 sm:px-8 bg-[#040812] border-t border-white/5">
-        <div className="max-w-7xl mx-auto space-y-16">
+      <section id="process" className="relative py-20 px-6 sm:px-8 bg-[#040812] border-t border-white/5">
+        <div className="max-w-7xl mx-auto space-y-12">
           <div className="space-y-3">
             <div className="flex items-center gap-2 font-mono text-xs text-[#EA580C] uppercase tracking-widest">
-              <span>(003)</span>
-              <span aria-hidden="true">·</span>
               <span>Our Methodology</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-heading font-extrabold text-white tracking-tight">
@@ -394,9 +384,6 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
                 key={idx}
                 className="glass-panel p-6 rounded-2xl border border-white/10 space-y-4 relative group hover:border-[#0284C7]/40 transition-all"
               >
-                <div className="font-mono text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#EA580C] to-[#0284C7]">
-                  {step.step}
-                </div>
                 <h3 className="text-base font-heading font-bold text-white group-hover:text-[#0EA5E9] transition-colors">
                   {step.title}
                 </h3>
@@ -412,9 +399,9 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       {/* ═══════════════════════════════════════════════
           STATS COUNTERS
       ═══════════════════════════════════════════════ */}
-      <section className="relative py-20 px-6 sm:px-8 bg-gradient-to-b from-[#060D1A] to-[#081524] border-t border-b border-white/5">
+      <section className="relative py-16 px-6 sm:px-8 bg-gradient-to-b from-[#060D1A] to-[#081524] border-t border-b border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 text-center">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 text-center">
             {stats.map((s, idx) => (
               <div key={idx} className="space-y-2">
                 <div className="text-3xl sm:text-5xl font-extrabold font-heading text-transparent bg-clip-text bg-gradient-to-r from-[#0EA5E9] via-[#0284C7] to-[#16A34A]">
@@ -435,12 +422,10 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       {/* ═══════════════════════════════════════════════
           TESTIMONIALS SECTION
       ═══════════════════════════════════════════════ */}
-      <section className="relative py-28 px-6 sm:px-8 bg-[#050A14]">
-        <div className="max-w-7xl mx-auto space-y-16">
+      <section className="relative py-20 px-6 sm:px-8 bg-[#050A14]">
+        <div className="max-w-7xl mx-auto space-y-12">
           <div className="space-y-3">
             <div className="flex items-center gap-2 font-mono text-xs text-[#0EA5E9] uppercase tracking-widest">
-              <span>(004)</span>
-              <span aria-hidden="true">·</span>
               <span>Client Endorsements</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-heading font-extrabold text-white tracking-tight">
@@ -471,12 +456,10 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       {/* ═══════════════════════════════════════════════
           FAQ SECTION (AEO & GEO Optimized)
       ═══════════════════════════════════════════════ */}
-      <section id="faq" className="relative py-28 px-6 sm:px-8 bg-[#060D1A] border-t border-white/5">
+      <section id="faq" className="relative py-20 px-6 sm:px-8 bg-[#060D1A] border-t border-white/5">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2 font-mono text-xs text-[#16A34A] uppercase tracking-widest">
-              <span>(005)</span>
-              <span aria-hidden="true">·</span>
               <span>Answer Engine Optimization (AEO)</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-heading font-extrabold text-white tracking-tight">
@@ -525,7 +508,7 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       {/* ═══════════════════════════════════════════════
           FINAL CALL TO ACTION
       ═══════════════════════════════════════════════ */}
-      <section className="relative py-28 px-6 sm:px-8 bg-[#03060D] border-t border-white/10 overflow-hidden text-center">
+      <section className="relative py-20 px-6 sm:px-8 bg-[#03060D] border-t border-white/10 overflow-hidden text-center">
         <div className="absolute inset-0 bg-gradient-to-tr from-[#0284C7]/15 via-transparent to-[#16A34A]/15 pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10 space-y-8">

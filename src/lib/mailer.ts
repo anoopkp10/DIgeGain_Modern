@@ -9,7 +9,7 @@ function createTransporter() {
   const pass = process.env.SMTP_PASS;
   const secure = process.env.SMTP_SECURE === 'true' || port === 465;
 
-  if (!host || !user) {
+  if (!host || !user || !pass) {
     return null;
   }
 
@@ -43,8 +43,9 @@ export async function verifySmtp(): Promise<{ ok: boolean; message: string }> {
 export async function sendClientConfirmation(lead: LeadData, contact: ContactData): Promise<{ success: boolean; error?: string }> {
   const transporter = createTransporter();
   if (!transporter) {
-    console.log('[Mailer] SMTP not configured. Simulating client confirmation send to:', lead.email);
-    return { success: true };
+    const error = 'SMTP is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS.';
+    console.error(`[Mailer] Client confirmation not sent to ${lead.email}: ${error}`);
+    return { success: false, error };
   }
 
   try {
@@ -70,8 +71,9 @@ export async function sendAdminNotification(lead: LeadData, contact: ContactData
   const recipient = notifyEmail || process.env.ADMIN_NOTIFY_EMAIL || 'anoopkp10@gmail.com';
 
   if (!transporter) {
-    console.log('[Mailer] SMTP not configured. Simulating admin notification send to:', recipient);
-    return { success: true };
+    const error = 'SMTP is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS.';
+    console.error(`[Mailer] Admin notification not sent to ${recipient}: ${error}`);
+    return { success: false, error };
   }
 
   try {

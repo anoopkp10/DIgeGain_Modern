@@ -149,7 +149,7 @@ export async function* streamChatResponse(
       }));
 
     const responseStream = await ai.models.generateContentStream({
-      model: process.env.LLM_MODEL || 'gemini-3.8-flash',
+      model: process.env.LLM_MODEL || 'gemini-2.5-flash',
       contents,
       config: {
         systemInstruction: systemPrompt,

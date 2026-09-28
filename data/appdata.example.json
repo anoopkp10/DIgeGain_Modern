@@ -2,7 +2,7 @@
   "contact": {
     "companyName": "DIGEGAIN",
     "tagline": "AI-Powered Web Systems & Digital Growth",
-    "email": "hello@digergain.com",
+    "email": "hello@digegain.com",
     "phone": "+91 98470 12345",
     "whatsappNumber": "919847012345",
     "whatsappMessage": "Hi DIGEGAIN, I'd like to discuss a project.",
@@ -14,7 +14,7 @@
       "country": "IN"
     },
     "geo": { "lat": 9.9984, "lng": 76.3575 },
-    "googleBusinessProfileUrl": "https://maps.google.com/?cid=digergain",
+    "googleBusinessProfileUrl": "https://maps.google.com/?cid=digegain",
     "googleMapsEmbedUrl": "",
     "googleReviewUrl": "",
     "workingHours": [{ "days": "Mon–Sat", "opens": "09:00", "closes": "18:00" }],
@@ -172,6 +172,6 @@
   },
   "settings": {
     "notifyEmail": "anoopkp10@gmail.com",
-    "siteUrl": "https://digergain.com"
+    "siteUrl": "https://digegain.com"
   }
 }
