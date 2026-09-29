@@ -52,7 +52,6 @@ import sharp from 'sharp';
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const isProd = process.env.NODE_ENV === 'production';
-app.set('trust proxy', 1);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -165,6 +164,10 @@ app.get('/llms-full.txt', async (req, res) => {
 // -------------------------------------------------------------
 // Public Data API Routes
 // -------------------------------------------------------------
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true, service: 'digegain-api' });
+});
+
 app.get('/api/appdata', async (req, res) => {
   try {
     const data = await readAppData();
@@ -361,8 +364,8 @@ app.post('/api/auth/login', async (req, res) => {
   const token = await createSessionToken(username);
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
+    secure: true,
+    sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   });
@@ -387,22 +390,14 @@ app.get('/api/auth/me', async (req, res) => {
 // -------------------------------------------------------------
 // Protected Admin Routes (Write & Management)
 // -------------------------------------------------------------
-function parseJsonField<T>(value: unknown, fallback: T): T {
+function parsePortfolioJson<T>(value: unknown, fallback: T): T {
   if (value === undefined || value === null || value === '') return fallback;
   if (typeof value !== 'string') return value as T;
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    throw new Error('Invalid JSON in portfolio form data');
-  }
+  return JSON.parse(value) as T;
 }
 
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+function slugifyPortfolioTitle(title: string): string {
+  return title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 async function savePortfolioForm(
@@ -410,12 +405,12 @@ async function savePortfolioForm(
   files: Express.Multer.File[],
   itemId?: string,
 ): Promise<PortfolioItem> {
-  const currentItems = await getPortfolio();
-  const previous = itemId ? currentItems.find(item => item.id === itemId) : undefined;
-  if (itemId && !previous) throw new Error('Portfolio item not found');
+  const portfolio = await getPortfolio();
+  const existing = itemId ? portfolio.find(item => item.id === itemId) : undefined;
+  if (itemId && !existing) throw new Error('Portfolio item not found');
 
-  const title = String(body.title || previous?.title || '').trim();
-  const retainedMedia = parseJsonField(body.existingMedia, previous?.media || []);
+  const title = String(body.title ?? existing?.title ?? '').trim();
+  const retainedMedia = parsePortfolioJson(body.existingMedia, existing?.media ?? []);
   const uploadedMedia = files.map(file => {
     const isVideo = file.mimetype.startsWith('video/');
     return {
@@ -425,27 +420,29 @@ async function savePortfolioForm(
     };
   });
 
-  const input = PortfolioItemSchema.parse({
+  const item = PortfolioItemSchema.parse({
     id: itemId || body.id || `prj-${Date.now()}`,
-    slug: body.slug || previous?.slug || slugify(title),
+    slug: body.slug || existing?.slug || slugifyPortfolioTitle(title),
     title,
-    category: body.category || previous?.category || 'Booking System',
-    description: body.description ?? previous?.description ?? '',
-    clientName: body.clientName ?? previous?.clientName ?? '',
-    projectUrl: body.projectUrl ?? previous?.projectUrl ?? '',
-    tags: parseJsonField(body.tags, previous?.tags || []),
+    category: body.category || existing?.category || 'Booking System',
+    description: body.description ?? existing?.description ?? '',
+    clientName: body.clientName ?? existing?.clientName ?? '',
+    projectUrl: body.projectUrl ?? existing?.projectUrl ?? '',
+    tags: parsePortfolioJson(body.tags, existing?.tags ?? []),
     media: [...retainedMedia, ...uploadedMedia],
-    coverIndex: previous?.coverIndex ?? 0,
-    featured: body.featured === undefined ? previous?.featured ?? false : body.featured === 'true' || body.featured === true,
-    order: previous?.order ?? 0,
-    createdAt: previous?.createdAt || new Date().toISOString(),
+    coverIndex: Number(body.coverIndex ?? existing?.coverIndex ?? 0),
+    featured: body.featured === undefined
+      ? existing?.featured ?? false
+      : body.featured === true || body.featured === 'true',
+    order: Number(body.order ?? existing?.order ?? 0),
+    createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   });
 
-  return savePortfolioItem(input);
+  return savePortfolioItem(item);
 }
 
-async function removeFailedUploads(files: Express.Multer.File[]) {
+async function removeUploadedFiles(files: Express.Multer.File[]) {
   await Promise.all(files.map(file => fs.unlink(file.path).catch(() => {})));
 }
 
@@ -464,7 +461,7 @@ app.post(['/api/admin/portfolio', '/api/portfolio'], requireAdmin, upload.array(
     const saved = await savePortfolioForm(req.body, files);
     res.json({ success: true, item: saved });
   } catch (err: any) {
-    await removeFailedUploads(files);
+    await removeUploadedFiles(files);
     res.status(400).json({ error: err.message || 'Failed to save portfolio project' });
   }
 });
@@ -475,7 +472,7 @@ app.put(['/api/admin/portfolio/:id', '/api/portfolio/:id'], requireAdmin, upload
     const saved = await savePortfolioForm(req.body, files, req.params.id);
     res.json({ success: true, item: saved });
   } catch (err: any) {
-    await removeFailedUploads(files);
+    await removeUploadedFiles(files);
     res.status(400).json({ error: err.message || 'Failed to update portfolio project' });
   }
 });
@@ -670,6 +667,10 @@ app.post(['/api/admin/test-email', '/api/test-email'], requireAdmin, async (req,
 // -------------------------------------------------------------
 // Static and Client Assets
 // -------------------------------------------------------------
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: `API endpoint not found: ${req.method} ${req.path}` });
+});
+
 app.use(express.static(path.resolve(process.cwd(), 'public')));
 
 async function startServer() {
