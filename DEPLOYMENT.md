@@ -25,6 +25,5 @@ Contact submissions are saved to `appdata.json` before email is attempted. A fai
 
 ## Troubleshooting API 404s
 
-- Open `/api/health`. A healthy Node process responds with `{"ok":true,"service":"digegain-api"}`. Unknown `/api/*` routes return JSON 404 responses rather than the React SPA.
-- If `/api/health` is also a 404, the domain is not routed to this Node.js application, the application root/start command is incorrect, or the Hostinger app has not restarted successfully. Verify the Node.js app is assigned to the domain and uses the project root with `npm start`.
-- If `/api/health` works but `/api/appdata` fails, check the Node application logs and ensure `data/appdata.example.json` is deployed and the `data/` directory is writable.
+- Test `/api/appdata`. If it returns a 404, verify the domain is assigned to the Node.js application, the application root is the project root, and Hostinger starts it with `node server.js` or `npm start`.
+- If `/api/appdata` returns a 500, check the Node application logs and ensure `data/appdata.example.json` is deployed and the `data/` directory is writable.

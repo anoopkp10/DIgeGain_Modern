@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
@@ -26,7 +25,6 @@ import {
   ContactFormSubmissionSchema,
   PortfolioItemSchema,
   LeadSchema,
-  type PortfolioItem,
 } from './src/lib/validators.ts';
 import {
   createSessionToken,
@@ -164,10 +162,6 @@ app.get('/llms-full.txt', async (req, res) => {
 // -------------------------------------------------------------
 // Public Data API Routes
 // -------------------------------------------------------------
-app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'digegain-api' });
-});
-
 app.get('/api/appdata', async (req, res) => {
   try {
     const data = await readAppData();
@@ -390,62 +384,6 @@ app.get('/api/auth/me', async (req, res) => {
 // -------------------------------------------------------------
 // Protected Admin Routes (Write & Management)
 // -------------------------------------------------------------
-function parsePortfolioJson<T>(value: unknown, fallback: T): T {
-  if (value === undefined || value === null || value === '') return fallback;
-  if (typeof value !== 'string') return value as T;
-  return JSON.parse(value) as T;
-}
-
-function slugifyPortfolioTitle(title: string): string {
-  return title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-
-async function savePortfolioForm(
-  body: Record<string, any>,
-  files: Express.Multer.File[],
-  itemId?: string,
-): Promise<PortfolioItem> {
-  const portfolio = await getPortfolio();
-  const existing = itemId ? portfolio.find(item => item.id === itemId) : undefined;
-  if (itemId && !existing) throw new Error('Portfolio item not found');
-
-  const title = String(body.title ?? existing?.title ?? '').trim();
-  const retainedMedia = parsePortfolioJson(body.existingMedia, existing?.media ?? []);
-  const uploadedMedia = files.map(file => {
-    const isVideo = file.mimetype.startsWith('video/');
-    return {
-      type: isVideo ? 'video' as const : 'image' as const,
-      path: `/uploads/portfolio/${isVideo ? 'videos' : 'images'}/${file.filename}`,
-      alt: path.parse(file.originalname).name,
-    };
-  });
-
-  const item = PortfolioItemSchema.parse({
-    id: itemId || body.id || `prj-${Date.now()}`,
-    slug: body.slug || existing?.slug || slugifyPortfolioTitle(title),
-    title,
-    category: body.category || existing?.category || 'Booking System',
-    description: body.description ?? existing?.description ?? '',
-    clientName: body.clientName ?? existing?.clientName ?? '',
-    projectUrl: body.projectUrl ?? existing?.projectUrl ?? '',
-    tags: parsePortfolioJson(body.tags, existing?.tags ?? []),
-    media: [...retainedMedia, ...uploadedMedia],
-    coverIndex: Number(body.coverIndex ?? existing?.coverIndex ?? 0),
-    featured: body.featured === undefined
-      ? existing?.featured ?? false
-      : body.featured === true || body.featured === 'true',
-    order: Number(body.order ?? existing?.order ?? 0),
-    createdAt: existing?.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
-
-  return savePortfolioItem(item);
-}
-
-async function removeUploadedFiles(files: Express.Multer.File[]) {
-  await Promise.all(files.map(file => fs.unlink(file.path).catch(() => {})));
-}
-
 app.put(['/api/admin/contact', '/api/contact'], requireAdmin, async (req, res) => {
   try {
     const updated = await updateContact(req.body);
@@ -455,24 +393,28 @@ app.put(['/api/admin/contact', '/api/contact'], requireAdmin, async (req, res) =
   }
 });
 
-app.post(['/api/admin/portfolio', '/api/portfolio'], requireAdmin, upload.array('media', 20), async (req, res) => {
-  const files = (req.files as Express.Multer.File[] | undefined) || [];
+app.post(['/api/admin/portfolio', '/api/portfolio'], requireAdmin, async (req, res) => {
   try {
-    const saved = await savePortfolioForm(req.body, files);
+    const parsed = PortfolioItemSchema.parse({
+      ...req.body,
+      id: req.body.id || `prj-${Date.now()}`,
+    });
+    const saved = await savePortfolioItem(parsed);
     res.json({ success: true, item: saved });
   } catch (err: any) {
-    await removeUploadedFiles(files);
     res.status(400).json({ error: err.message || 'Failed to save portfolio project' });
   }
 });
 
-app.put(['/api/admin/portfolio/:id', '/api/portfolio/:id'], requireAdmin, upload.array('media', 20), async (req, res) => {
-  const files = (req.files as Express.Multer.File[] | undefined) || [];
+app.put(['/api/admin/portfolio/:id', '/api/portfolio/:id'], requireAdmin, async (req, res) => {
   try {
-    const saved = await savePortfolioForm(req.body, files, req.params.id);
+    const parsed = PortfolioItemSchema.parse({
+      ...req.body,
+      id: req.params.id,
+    });
+    const saved = await savePortfolioItem(parsed);
     res.json({ success: true, item: saved });
   } catch (err: any) {
-    await removeUploadedFiles(files);
     res.status(400).json({ error: err.message || 'Failed to update portfolio project' });
   }
 });
@@ -667,21 +609,9 @@ app.post(['/api/admin/test-email', '/api/test-email'], requireAdmin, async (req,
 // -------------------------------------------------------------
 // Static and Client Assets
 // -------------------------------------------------------------
-app.use('/api', (req, res) => {
-  res.status(404).json({ error: `API endpoint not found: ${req.method} ${req.path}` });
-});
-
 app.use(express.static(path.resolve(process.cwd(), 'public')));
 
 async function startServer() {
-  if (isProd) {
-    const missing = ['ADMIN_USERNAME', 'ADMIN_PASSWORD', 'SESSION_SECRET']
-      .filter(name => !process.env[name]);
-    if (missing.length) {
-      throw new Error(`Missing required production environment variables: ${missing.join(', ')}`);
-    }
-  }
-
   if (!isProd) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
