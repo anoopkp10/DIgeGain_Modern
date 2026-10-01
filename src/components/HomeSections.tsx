@@ -158,30 +158,6 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
     { value: '14 Days', label: 'Rapid Sprint Delivery', sub: 'From blueprint to live launch' },
   ];
 
-  const testimonials = [
-    {
-      quote:
-        'DIGEGAIN transformed our outpatient scheduling. Our clinic previously lost dozens of appointments due to busy phone lines. Now, 85% of our patients book and receive WhatsApp confirmations automatically.',
-      author: 'Dr. Ramesh Nair',
-      role: 'Medical Director',
-      company: 'PulseCare Healthcare',
-    },
-    {
-      quote:
-        'The contactless QR ordering and live kitchen screen system DIGEGAIN built has sped up our table turnaround by 30%. Our waiters spend less time writing orders and more time delighting diners.',
-      author: 'Priya Menon',
-      role: 'Founding Partner',
-      company: 'Bistro Group Hospitality',
-    },
-    {
-      quote:
-        'As an architecture firm, our portfolio is our handshake. The WebGL 3D showcase DIGEGAIN created gives our studio the luxury, tactile authority needed to close high-ticket commercial projects.',
-      author: 'Anand Kurian',
-      role: 'Principal Architect',
-      company: 'Apex Design Studio',
-    },
-  ];
-
   const faqs = [
     {
       q: 'What does DIGEGAIN do?',
@@ -412,40 +388,6 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
                 </div>
                 <div className="text-[11px] font-mono text-slate-400">
                   {s.sub}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════
-          TESTIMONIALS SECTION
-      ═══════════════════════════════════════════════ */}
-      <section className="relative py-20 px-6 sm:px-8 bg-[#050A14]">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 font-mono text-xs text-[#0EA5E9] uppercase tracking-widest">
-              <span>Client Endorsements</span>
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-heading font-extrabold text-white tracking-tight">
-              Trusted by Ambitious Service Leaders
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((t, idx) => (
-              <div
-                key={idx}
-                className="glass-panel p-8 rounded-2xl border border-white/10 flex flex-col justify-between space-y-6"
-              >
-                <p className="text-sm text-slate-300 leading-relaxed italic">
-                  "{t.quote}"
-                </p>
-                <div className="pt-4 border-t border-white/5 space-y-1">
-                  <div className="text-sm font-bold text-white font-heading">{t.author}</div>
-                  <div className="text-xs font-mono text-[#0EA5E9]">{t.role}</div>
-                  <div className="text-xs text-slate-400">{t.company}</div>
                 </div>
               </div>
             ))}

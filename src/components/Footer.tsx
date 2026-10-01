@@ -1,7 +1,7 @@
 import React from 'react';
 import { Logo } from './ui/Logo.tsx';
 import { ContactData } from '../lib/validators.ts';
-import { Mail, MapPin, Clock, ArrowUpRight, MessageCircle, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, ArrowUpRight, MessageCircle, Facebook, Instagram, Linkedin } from 'lucide-react';
 
 interface FooterProps {
   contact: ContactData;
@@ -137,6 +137,14 @@ export const Footer: React.FC<FooterProps> = ({ contact, onNavigate }) => {
                   {contact.email}
                 </a>
               </div>
+              {contact.phone && (
+                <div className="flex items-center gap-2.5">
+                  <Phone className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
+                  <a href={`tel:${contact.phone.replace(/[^\d+]/g, '')}`} className="hover:text-white transition-colors">
+                    {contact.phone}
+                  </a>
+                </div>
+              )}
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
                 <span>

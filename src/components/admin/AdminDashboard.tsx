@@ -30,12 +30,14 @@ import {
 
 interface AdminDashboardProps {
   initialData: AppData;
+  onAppDataUpdate: (data: AppData) => void;
   onLogout: () => void;
   onBackToSite: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   initialData,
+  onAppDataUpdate,
   onLogout,
   onBackToSite,
 }) => {
@@ -123,6 +125,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         body: JSON.stringify(appData.contact),
       });
       if (!res.ok) throw new Error('Failed to update contact info');
+      const result = await res.json();
+      const updatedData = { ...appData, contact: result.contact || appData.contact };
+      setAppData(updatedData);
+      onAppDataUpdate(updatedData);
       showToast('Contact details successfully updated!');
     } catch (err: any) {
       showToast(err.message, 'error');
@@ -197,12 +203,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       const result = await res.json();
       const updatedItem = result.item || result;
 
-      setAppData(prev => {
-        const nextList = editingItem
-          ? prev.portfolio.map(p => (p.id === updatedItem.id ? updatedItem : p))
-          : [updatedItem, ...prev.portfolio];
-        return { ...prev, portfolio: nextList };
-      });
+      const nextList = editingItem
+        ? appData.portfolio.map(p => (p.id === updatedItem.id ? updatedItem : p))
+        : [updatedItem, ...appData.portfolio];
+      const updatedData = { ...appData, portfolio: nextList };
+      setAppData(updatedData);
+      onAppDataUpdate(updatedData);
 
       showToast(editingItem ? 'Project updated!' : 'New project published!');
       setIsNewProjectModalOpen(false);
@@ -227,10 +233,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       });
       if (!res.ok) throw new Error('Delete failed');
 
-      setAppData(prev => ({
-        ...prev,
-        portfolio: prev.portfolio.filter(p => p.id !== id),
-      }));
+      const updatedData = {
+        ...appData,
+        portfolio: appData.portfolio.filter(p => p.id !== id),
+      };
+      setAppData(updatedData);
+      onAppDataUpdate(updatedData);
       showToast('Project removed');
     } catch (err: any) {
       showToast(err.message, 'error');
@@ -378,6 +386,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         body: JSON.stringify(appData.assistant),
       });
       if (!res.ok) throw new Error('Failed to update assistant settings');
+      const result = await res.json();
+      const updatedData = { ...appData, assistant: result.assistant || appData.assistant };
+      setAppData(updatedData);
+      onAppDataUpdate(updatedData);
       showToast('AI Assistant settings updated!');
     } catch (err: any) {
       showToast(err.message, 'error');
@@ -454,6 +466,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         body: JSON.stringify(appData.settings),
       });
       if (!res.ok) throw new Error('Failed to update email settings');
+      const result = await res.json();
+      const updatedData = { ...appData, settings: result.settings || appData.settings };
+      setAppData(updatedData);
+      onAppDataUpdate(updatedData);
       showToast('Notification email settings saved!');
     } catch (err: any) {
       showToast(err.message, 'error');
@@ -881,10 +897,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="flex items-center justify-between pb-4 border-b border-white/10">
                 <div>
                   <h2 className="text-xl font-heading font-bold text-white">
-                    Contact & Google Business Profile
+                    Contact Details
                   </h2>
                   <p className="text-xs text-slate-400">
-                    Controls all NAP details, footer coordinates, and WhatsApp links across the app.
+                    Manage the contact information displayed across the public site.
                   </p>
                 </div>
                 <button
@@ -1055,48 +1071,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
 
-              {/* Google Business Profile & Maps */}
-              <div className="space-y-3 pt-2">
-                <h3 className="text-xs font-mono uppercase text-[#EA580C]">Google Business Profile Integration</h3>
-                <div className="space-y-2">
-                  <input
-                    type="url"
-                    placeholder="Google Business Profile URL"
-                    value={appData.contact.googleBusinessProfileUrl || ''}
-                    onChange={e =>
-                      setAppData(prev => ({
-                        ...prev,
-                        contact: { ...prev.contact, googleBusinessProfileUrl: e.target.value },
-                      }))
-                    }
-                    className="w-full px-3 py-2 rounded-lg bg-[#060D1A] border border-white/10 text-xs text-white"
-                  />
-                  <input
-                    type="url"
-                    placeholder="Google Review URL"
-                    value={appData.contact.googleReviewUrl || ''}
-                    onChange={e =>
-                      setAppData(prev => ({
-                        ...prev,
-                        contact: { ...prev.contact, googleReviewUrl: e.target.value },
-                      }))
-                    }
-                    className="w-full px-3 py-2 rounded-lg bg-[#060D1A] border border-white/10 text-xs text-white"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Google Maps Embed URL (iframe src)"
-                    value={appData.contact.googleMapsEmbedUrl || ''}
-                    onChange={e =>
-                      setAppData(prev => ({
-                        ...prev,
-                        contact: { ...prev.contact, googleMapsEmbedUrl: e.target.value },
-                      }))
-                    }
-                    className="w-full px-3 py-2 rounded-lg bg-[#060D1A] border border-white/10 text-xs text-white"
-                  />
-                </div>
-              </div>
             </form>
           )}
 

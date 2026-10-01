@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { ContactData } from '../lib/validators.ts';
 import {
   Mail,
-  MapPin,
+  Phone,
   Clock,
   MessageCircle,
-  Star,
   ExternalLink,
   Send,
   CheckCircle2,
@@ -275,7 +274,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
           )}
         </div>
 
-        {/* Contact Info & Google Business Profile Column */}
+        {/* Contact Info Column */}
         <div className="lg:col-span-5 space-y-6">
           {/* Quick Connect Cards */}
           <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/10 space-y-6">
@@ -313,6 +312,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                   <div>
                     <div className="text-xs font-mono text-slate-400">Official Inquiries</div>
                     <div className="text-sm font-bold">{contact.email}</div>
+                    {contact.phone && (
+                      <a
+                        href={`tel:${contact.phone.replace(/[^\d+]/g, '')}`}
+                        className="mt-1 inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-white transition-colors"
+                      >
+                        <Phone className="w-3 h-3" />
+                        {contact.phone}
+                      </a>
+                    )}
                   </div>
                 </div>
                 <ExternalLink className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
@@ -320,55 +328,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
             </div>
           </div>
 
-          {/* Google Business Profile Block (Section 10) */}
-          <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/10 space-y-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-mono text-[#EA580C]">
-                <MapPin className="w-4 h-4" />
-                <span>Google Business Profile</span>
-              </div>
-              <div className="flex items-center gap-1 text-amber-400 text-xs">
-                <Star className="w-3.5 h-3.5 fill-amber-400" />
-                <span className="font-bold">5.0</span>
-                <span className="text-slate-400">(Verified)</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-lg font-heading font-bold text-white">
-                {contact.companyName}
-              </h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                {contact.address.street}, {contact.address.city}, {contact.address.state}, {contact.address.postalCode}
-              </p>
-              <div className="text-xs font-mono text-slate-400 flex items-center gap-1.5 pt-1">
-                <Clock className="w-3.5 h-3.5 text-[#16A34A]" />
-                <span>
-                  {contact.workingHours?.[0]?.days}: {contact.workingHours?.[0]?.opens} – {contact.workingHours?.[0]?.closes}
-                </span>
-              </div>
-            </div>
-
-            {/* Embedded Google Map */}
-            {contact.googleMapsEmbedUrl ? (
-              <div className="rounded-xl overflow-hidden aspect-[16/9] border border-white/10">
-                <iframe
-                  src={contact.googleMapsEmbedUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="DIGEGAIN Location Map"
-                />
-              </div>
-            ) : (
-              <div className="aspect-[16/9] rounded-xl bg-[#060D1A] border border-white/10 flex items-center justify-center text-xs font-mono text-slate-500">
-                Kochi Infopark Phase 2 · Kerala
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

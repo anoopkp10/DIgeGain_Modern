@@ -162,6 +162,7 @@ export default function App() {
       return (
         <AdminDashboard
           initialData={appData}
+          onAppDataUpdate={setAppData}
           onLogout={() => setAdminUser(null)}
           onBackToSite={() => navigate('/')}
         />
