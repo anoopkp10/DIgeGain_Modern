@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { constants as fsConstants } from 'node:fs';
 import path from 'path';
 import { AppData, AppDataSchema, ContactData, PortfolioItem, LeadData, AssistantData, SettingsData } from './validators.ts';
 
@@ -46,7 +47,8 @@ export async function writeAppData(data: AppData): Promise<void> {
   return withLock(async () => {
     // Validate before writing
     const validated = AppDataSchema.parse(data);
-    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.mkdir(DATA_DIR, { recursive: true, mode: 0o700 });
+    await fs.access(DATA_DIR, fsConstants.R_OK | fsConstants.W_OK | fsConstants.X_OK);
 
     // 1. Create rolling backup if current file exists
     try {
@@ -57,7 +59,7 @@ export async function writeAppData(data: AppData): Promise<void> {
 
     // 2. Atomic write: write to temp file, then rename
     const jsonStr = JSON.stringify(validated, null, 2);
-    await fs.writeFile(TEMP_FILE, jsonStr, 'utf-8');
+    await fs.writeFile(TEMP_FILE, jsonStr, { encoding: 'utf-8', mode: 0o600 });
     await fs.rename(TEMP_FILE, DATA_FILE);
   });
 }

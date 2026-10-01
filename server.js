@@ -2,12 +2,14 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import { constants as fsConstants2 } from "node:fs";
 import path2 from "path";
 import fs2 from "fs/promises";
 import { createServer as createViteServer } from "vite";
 
 // src/lib/data.ts
 import fs from "fs/promises";
+import { constants as fsConstants } from "node:fs";
 import path from "path";
 
 // src/lib/validators.ts
@@ -177,13 +179,14 @@ async function readAppData() {
 async function writeAppData(data) {
   return withLock(async () => {
     const validated = AppDataSchema.parse(data);
-    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.mkdir(DATA_DIR, { recursive: true, mode: 448 });
+    await fs.access(DATA_DIR, fsConstants.R_OK | fsConstants.W_OK | fsConstants.X_OK);
     try {
       await fs.copyFile(DATA_FILE, BACKUP_FILE);
     } catch {
     }
     const jsonStr = JSON.stringify(validated, null, 2);
-    await fs.writeFile(TEMP_FILE, jsonStr, "utf-8");
+    await fs.writeFile(TEMP_FILE, jsonStr, { encoding: "utf-8", mode: 384 });
     await fs.rename(TEMP_FILE, DATA_FILE);
   });
 }
@@ -845,11 +848,10 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 var UPLOADS_DIR = path2.resolve(process.cwd(), "public/uploads");
 var storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
+  destination: (req, file, cb) => {
     const isVideo = file.mimetype.startsWith("video/");
     const targetDir = path2.join(UPLOADS_DIR, "portfolio", isVideo ? "videos" : "images");
-    await fs2.mkdir(targetDir, { recursive: true });
-    cb(null, targetDir);
+    void fs2.mkdir(targetDir, { recursive: true, mode: 493 }).then(() => fs2.access(targetDir, fsConstants2.R_OK | fsConstants2.W_OK | fsConstants2.X_OK)).then(() => cb(null, targetDir)).catch((err) => cb(err, targetDir));
   },
   filename: (req, file, cb) => {
     const ext = path2.extname(file.originalname).toLowerCase();
@@ -1106,6 +1108,54 @@ app.get("/api/auth/me", async (req, res) => {
   const { valid, username } = await verifySessionToken(token);
   res.json({ authenticated: valid, user: valid ? username : null });
 });
+function parsePortfolioJson(value, fallback) {
+  if (value === void 0 || value === null || value === "") return fallback;
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new Error("Invalid JSON in portfolio form data");
+  }
+}
+function slugifyPortfolioTitle(title) {
+  return title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+async function savePortfolioForm(body, files, itemId) {
+  const portfolio = await getPortfolio();
+  const existing = itemId ? portfolio.find((item2) => item2.id === itemId) : void 0;
+  if (itemId && !existing) throw new Error("Portfolio item not found");
+  const title = String(body.title ?? existing?.title ?? "").trim();
+  const retainedMedia = parsePortfolioJson(body.existingMedia, existing?.media ?? []);
+  const uploadedMedia = files.map((file) => {
+    const isVideo = file.mimetype.startsWith("video/");
+    return {
+      type: isVideo ? "video" : "image",
+      path: `/uploads/portfolio/${isVideo ? "videos" : "images"}/${file.filename}`,
+      alt: path2.parse(file.originalname).name
+    };
+  });
+  const item = PortfolioItemSchema.parse({
+    id: itemId || body.id || `prj-${Date.now()}`,
+    slug: body.slug || existing?.slug || slugifyPortfolioTitle(title),
+    title,
+    category: body.category || existing?.category || "Booking System",
+    description: body.description ?? existing?.description ?? "",
+    clientName: body.clientName ?? existing?.clientName ?? "",
+    projectUrl: body.projectUrl ?? existing?.projectUrl ?? "",
+    tags: parsePortfolioJson(body.tags, existing?.tags ?? []),
+    media: [...retainedMedia, ...uploadedMedia],
+    coverIndex: Number(body.coverIndex ?? existing?.coverIndex ?? 0),
+    featured: body.featured === void 0 ? existing?.featured ?? false : body.featured === true || body.featured === "true",
+    order: Number(body.order ?? existing?.order ?? 0),
+    createdAt: existing?.createdAt || (/* @__PURE__ */ new Date()).toISOString(),
+    updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+  });
+  return savePortfolioItem(item);
+}
+async function removeUploadedFiles(files) {
+  await Promise.all(files.map((file) => fs2.unlink(file.path).catch(() => {
+  })));
+}
 app.put(["/api/admin/contact", "/api/contact"], requireAdmin, async (req, res) => {
   try {
     const updated = await updateContact(req.body);
@@ -1114,27 +1164,23 @@ app.put(["/api/admin/contact", "/api/contact"], requireAdmin, async (req, res) =
     res.status(400).json({ error: err.message || "Failed to update contact" });
   }
 });
-app.post(["/api/admin/portfolio", "/api/portfolio"], requireAdmin, async (req, res) => {
+app.post(["/api/admin/portfolio", "/api/portfolio"], requireAdmin, upload.array("media", 20), async (req, res) => {
+  const files = req.files || [];
   try {
-    const parsed = PortfolioItemSchema.parse({
-      ...req.body,
-      id: req.body.id || `prj-${Date.now()}`
-    });
-    const saved = await savePortfolioItem(parsed);
+    const saved = await savePortfolioForm(req.body, files);
     res.json({ success: true, item: saved });
   } catch (err) {
+    await removeUploadedFiles(files);
     res.status(400).json({ error: err.message || "Failed to save portfolio project" });
   }
 });
-app.put(["/api/admin/portfolio/:id", "/api/portfolio/:id"], requireAdmin, async (req, res) => {
+app.put(["/api/admin/portfolio/:id", "/api/portfolio/:id"], requireAdmin, upload.array("media", 20), async (req, res) => {
+  const files = req.files || [];
   try {
-    const parsed = PortfolioItemSchema.parse({
-      ...req.body,
-      id: req.params.id
-    });
-    const saved = await savePortfolioItem(parsed);
+    const saved = await savePortfolioForm(req.body, files, req.params.id);
     res.json({ success: true, item: saved });
   } catch (err) {
+    await removeUploadedFiles(files);
     res.status(400).json({ error: err.message || "Failed to update portfolio project" });
   }
 });
@@ -1298,6 +1344,9 @@ app.post(["/api/admin/test-email", "/api/test-email"], requireAdmin, async (req,
 });
 app.use(express.static(path2.resolve(process.cwd(), "public")));
 async function startServer() {
+  const dataDir = path2.resolve(process.cwd(), "data");
+  await ensureWritableDirectory(dataDir, 448, "data");
+  await ensureWritableDirectory(UPLOADS_DIR, 493, "public/uploads");
   if (!isProd) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -1313,5 +1362,13 @@ async function startServer() {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`[DIGEGAIN] Server active on port ${PORT}`);
   });
+}
+async function ensureWritableDirectory(directory, mode, label) {
+  await fs2.mkdir(directory, { recursive: true, mode });
+  try {
+    await fs2.access(directory, fsConstants2.R_OK | fsConstants2.W_OK | fsConstants2.X_OK);
+  } catch {
+    throw new Error(`The Node.js process needs read/write access to ${label} (${directory}).`);
+  }
 }
 startServer();

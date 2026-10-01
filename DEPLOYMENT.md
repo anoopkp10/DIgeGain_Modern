@@ -8,7 +8,7 @@ This project uses one Express server for the website, admin API, uploads, email,
 2. If Hostinger asks for an application startup file, set it to `server.js`. Set the start command to `npm start` when Hostinger provides a start-command field.
 3. Set the environment variables below in Hostinger's Node.js application settings. Do not upload real secrets in `.env.example` or commit a `.env` file.
 4. Deploy the source and run `npm ci --include=dev` and `npm run build` in the application directory. If Hostinger installs production dependencies after building, Vite is only needed during the build; the production server does not load it. Start or restart the Node.js application afterward with `npm start`.
-5. Ensure the application user can write to `data/` and `public/uploads/portfolio/`. Data is persisted in `data/appdata.json`; uploaded project media is persisted under `public/uploads/portfolio/images/` and `public/uploads/portfolio/videos/`. Keep these directories when deploying updates and include them in backups.
+5. Ensure the Node.js application user owns or can read/write `data/` and `public/uploads/portfolio/`. Data is persisted in `data/appdata.json`; uploaded project media is persisted under `public/uploads/portfolio/images/` and `public/uploads/portfolio/videos/`. Keep these directories when deploying updates and include them in backups. The app creates missing directories with private/readable owner permissions and checks access at startup; do not use `777`.
 
 ## Environment
 
