@@ -2,22 +2,31 @@
   "contact": {
     "companyName": "DIGEGAIN",
     "tagline": "AI-Powered Web Systems & Digital Growth",
-    "email": "hello@digegain.com",
-    "phone": "+91 98470 12345",
-    "whatsappNumber": "919847012345",
+    "email": "contact@digegain.com",
+    "phone": "+91 9961225385",
+    "whatsappNumber": "6282995815",
     "whatsappMessage": "Hi DIGEGAIN, I'd like to discuss a project.",
     "address": {
-      "street": "Infopark Phase 2, Kakkanad",
+      "street": " Kakkanad",
       "city": "Kochi",
       "state": "Kerala",
       "postalCode": "682042",
       "country": "IN"
     },
-    "geo": { "lat": 9.9984, "lng": 76.3575 },
+    "geo": {
+      "lat": 9.9984,
+      "lng": 76.3575
+    },
     "googleBusinessProfileUrl": "https://maps.google.com/?cid=digegain",
     "googleMapsEmbedUrl": "",
     "googleReviewUrl": "",
-    "workingHours": [{ "days": "Mon–Sat", "opens": "09:00", "closes": "18:00" }],
+    "workingHours": [
+      {
+        "days": "Mon–Sat",
+        "opens": "09:00",
+        "closes": "18:00"
+      }
+    ],
     "socials": {
       "facebook": "",
       "instagram": "",
@@ -36,7 +45,13 @@
       "description": "Outpatient scheduling system with automated slot allocation, doctor multi-roster synchronization, and real-time WhatsApp appointment reminders.",
       "clientName": "PulseCare Healthcare Network",
       "projectUrl": "https://pulsecare.example.com",
-      "tags": ["TypeScript", "React", "WhatsApp API", "PostgreSQL", "Healthcare"],
+      "tags": [
+        "TypeScript",
+        "React",
+        "WhatsApp API",
+        "PostgreSQL",
+        "Healthcare"
+      ],
       "media": [
         {
           "type": "image",
@@ -58,7 +73,13 @@
       "description": "Contactless QR dining and live kitchen display system (KDS) synchronizing table orders, split bills, and live kitchen dispatch in under 200ms.",
       "clientName": "BistroFlow Hospitality",
       "projectUrl": "https://bistroflow.example.com",
-      "tags": ["React", "WebSockets", "Node.js", "KDS", "Hospitality"],
+      "tags": [
+        "React",
+        "WebSockets",
+        "Node.js",
+        "KDS",
+        "Hospitality"
+      ],
       "media": [
         {
           "type": "image",
@@ -80,7 +101,13 @@
       "description": "Ultra-fast WebGL portfolio featuring fluid cursor interactions, dynamic case-study presentations, and automated inquiry pipeline routing.",
       "clientName": "Apex Design Architecture",
       "projectUrl": "https://apexdesign.example.com",
-      "tags": ["WebGL", "Three.js", "Tailwind CSS", "AEO", "Creative"],
+      "tags": [
+        "WebGL",
+        "Three.js",
+        "Tailwind CSS",
+        "AEO",
+        "Creative"
+      ],
       "media": [
         {
           "type": "image",
@@ -102,7 +129,13 @@
       "description": "Real-time unified BI dashboard providing revenue forecasting, staff capacity analytics, automated invoicing, and role-based access control.",
       "clientName": "OmniMetric Global",
       "projectUrl": "https://omnimetric.example.com",
-      "tags": ["React", "TypeScript", "DataViz", "Node.js", "Enterprise"],
+      "tags": [
+        "React",
+        "TypeScript",
+        "DataViz",
+        "Node.js",
+        "Enterprise"
+      ],
       "media": [
         {
           "type": "image",
@@ -124,7 +157,13 @@
       "description": "Dedicated beauty suite booking engine with stylist preference selection, automated package upselling, and deposit payment processing.",
       "clientName": "LuxeSalon & Spa",
       "projectUrl": "https://luxesalon.example.com",
-      "tags": ["React", "Mobile First", "WhatsApp Reminders", "Stripe", "Salon"],
+      "tags": [
+        "React",
+        "Mobile First",
+        "WhatsApp Reminders",
+        "Stripe",
+        "Salon"
+      ],
       "media": [
         {
           "type": "image",
@@ -146,7 +185,12 @@
       "description": "Wholesale ordering platform with tiered merchant pricing, automated recurring delivery schedules, and GST-compliant invoice generation.",
       "clientName": "Artisan Bakery Works",
       "projectUrl": "https://artisan.example.com",
-      "tags": ["Next.js", "Node.js", "B2B Commerce", "Automated Billing"],
+      "tags": [
+        "Next.js",
+        "Node.js",
+        "B2B Commerce",
+        "Automated Billing"
+      ],
       "media": [
         {
           "type": "image",
@@ -161,12 +205,85 @@
       "updatedAt": "2026-01-22T10:00:00.000Z"
     }
   ],
-  "leads": [],
+  "leads": [
+    {
+      "id": "lead-1790760076268-lsi4",
+      "name": "kuttappan",
+      "email": "anoopkp10@gmail.com",
+      "phone": "3423423424",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "asdadadads",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "failed",
+        "error": "SMTP is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS."
+      },
+      "status": "new",
+      "createdAt": "2026-09-30T09:21:16.268Z"
+    },
+    {
+      "id": "lead-1790760026583-6218",
+      "name": "kp",
+      "email": "anoopkp10@gmail.com",
+      "phone": "6464646464",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "hdhdfhdh dhdhdhd",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "failed",
+        "error": "SMTP is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS."
+      },
+      "status": "new",
+      "createdAt": "2026-09-30T09:20:26.583Z"
+    },
+    {
+      "id": "lead-1790759972151-s5fk",
+      "name": "Dhanush",
+      "email": "d@yahoo.com",
+      "phone": "53452352",
+      "service": "AI Chatbots & Workflow Automation",
+      "budget": "",
+      "message": "dsadasd dfdgdfgdgd",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "failed",
+        "error": "SMTP is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS."
+      },
+      "status": "new",
+      "createdAt": "2026-09-30T09:19:32.152Z"
+    },
+    {
+      "id": "lead-1790595591556-4yg8",
+      "name": "tnaku",
+      "email": "ano11opkp10@gmail.com",
+      "phone": "09961225382",
+      "service": "AI Assistant Qualified Lead",
+      "budget": "",
+      "message": "Captured from DIGEGAIN AI Chat Widget",
+      "source": "ai-assistant",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "failed",
+        "error": "SMTP is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS."
+      },
+      "status": "new",
+      "createdAt": "2026-09-28T11:39:51.558Z"
+    }
+  ],
   "assistant": {
     "enabled": true,
     "name": "DIGEGAIN AI",
     "greeting": "Hi! I'm DIGEGAIN's AI assistant. Ask me about our services, our approach, or past projects.",
-    "suggestedQuestions": ["What services do you offer?", "Show me your portfolio", "How can I contact you?"],
+    "suggestedQuestions": [
+      "What services do you offer?",
+      "Show me your portfolio",
+      "How can I contact you?"
+    ],
     "extraKnowledge": [],
     "leadCaptureEnabled": true
   },
