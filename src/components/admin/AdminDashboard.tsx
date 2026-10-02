@@ -5,6 +5,7 @@ import {
   PortfolioItem,
   Lead,
   AssistantData,
+  SmtpConfig,
 } from '../../lib/validators.ts';
 import { Logo } from '../ui/Logo.tsx';
 import {
@@ -26,6 +27,9 @@ import {
   Search,
   MessageCircle,
   Eye,
+  EyeOff,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -73,12 +77,94 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     tags: '',
     featured: false,
   });
-  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [uploadPreview, setUploadPreview] = useState<string[]>([]);
+  // One uploaded image/video per item
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadPreview, setUploadPreview] = useState<{ url: string; type: 'image' | 'video'; name: string } | null>(null);
+  const [existingMedia, setExistingMedia] = useState<{ type: 'image' | 'video'; path: string; alt?: string } | null>(null);
   const [uploadProgress, setUploadProgress] = useState(false);
 
-  // Email test state
+  // Email settings states
   const [testEmailLoading, setTestEmailLoading] = useState(false);
+  const [showSmtpPass, setShowSmtpPass] = useState(false);
+
+  const applySmtpPreset = (preset: 'gmail' | 'office365' | 'zoho') => {
+    if (preset === 'gmail') {
+      setAppData(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          smtp: {
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            user: prev.settings.smtp?.user || prev.settings.notifyEmail || '',
+            pass: prev.settings.smtp?.pass || '',
+            fromEmail: prev.settings.smtp?.fromEmail || prev.settings.notifyEmail || '',
+            fromName: prev.settings.smtp?.fromName || 'DIGEGAIN Project Alerts',
+          },
+        },
+      }));
+      showToast('Gmail preset applied! Enter your 16-character App Password.');
+    } else if (preset === 'office365') {
+      setAppData(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          smtp: {
+            host: 'smtp.office365.com',
+            port: 587,
+            secure: false,
+            user: prev.settings.smtp?.user || '',
+            pass: prev.settings.smtp?.pass || '',
+            fromEmail: prev.settings.smtp?.fromEmail || '',
+            fromName: prev.settings.smtp?.fromName || 'DIGEGAIN Project Alerts',
+          },
+        },
+      }));
+      showToast('Office 365 preset applied! Enter your credentials.');
+    } else if (preset === 'zoho') {
+      setAppData(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          smtp: {
+            host: 'smtp.zoho.com',
+            port: 465,
+            secure: true,
+            user: prev.settings.smtp?.user || '',
+            pass: prev.settings.smtp?.pass || '',
+            fromEmail: prev.settings.smtp?.fromEmail || '',
+            fromName: prev.settings.smtp?.fromName || 'DIGEGAIN Project Alerts',
+          },
+        },
+      }));
+      showToast('Zoho Mail preset applied! Enter your credentials.');
+    }
+  };
+
+  const updateSmtpField = <K extends keyof NonNullable<SmtpConfig>>(field: K, value: NonNullable<SmtpConfig>[K]) => {
+    setAppData(prev => {
+      const current: NonNullable<SmtpConfig> = prev.settings.smtp || {
+        host: '',
+        port: 465,
+        secure: true,
+        user: '',
+        pass: '',
+        fromEmail: '',
+        fromName: 'DIGEGAIN Web Systems',
+      };
+      return {
+        ...prev,
+        settings: {
+          ...prev.settings,
+          smtp: {
+            ...current,
+            [field]: value,
+          },
+        },
+      };
+    });
+  };
 
   // Show Toast Helper
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -138,15 +224,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // ═════════════════════════════════════════════════
-  // PORTFOLIO ACTIONS
+  // PORTFOLIO ACTIONS (One uploaded image or video per item)
   // ═════════════════════════════════════════════════
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setUploadFiles(files);
-      const previews = files.map(f => URL.createObjectURL(f));
-      setUploadPreview(previews);
+  const handleSingleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const isVideo = file.type.startsWith('video/') || /\.(mp4|webm)$/i.test(file.name);
+      setUploadFile(file);
+      setUploadPreview({
+        url: URL.createObjectURL(file),
+        type: isVideo ? 'video' : 'image',
+        name: file.name,
+      });
     }
+  };
+
+  const handleClearSelectedFile = () => {
+    setUploadFile(null);
+    setUploadPreview(null);
   };
 
   const handleCreateOrUpdateProject = async (e: React.FormEvent) => {
@@ -171,15 +266,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )
       );
 
-      // Add uploaded files
-      uploadFiles.forEach(file => {
-        formData.append('media', file);
-      });
+      // Single uploaded image or video
+      if (uploadFile) {
+        formData.append('media', uploadFile);
+      } else if (existingMedia) {
+        formData.append('existingMedia', JSON.stringify([existingMedia]));
+      }
 
       let res;
       if (editingItem) {
-        // Retain existing media
-        formData.append('existingMedia', JSON.stringify(editingItem.media));
         res = await fetch(`/api/admin/portfolio/${editingItem.id}`, {
           method: 'PUT',
           headers: getAuthHeaders(),
@@ -213,8 +308,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       showToast(editingItem ? 'Project updated!' : 'New project published!');
       setIsNewProjectModalOpen(false);
       setEditingItem(null);
-      setUploadFiles([]);
-      setUploadPreview([]);
+      setUploadFile(null);
+      setUploadPreview(null);
+      setExistingMedia(null);
     } catch (err: any) {
       showToast(err.message, 'error');
     } finally {
@@ -256,8 +352,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       tags: item.tags.join(', '),
       featured: Boolean(item.featured),
     });
-    setUploadFiles([]);
-    setUploadPreview([]);
+    setUploadFile(null);
+    setUploadPreview(null);
+    setExistingMedia(item.media?.[0] || null);
     setIsNewProjectModalOpen(true);
   };
 
@@ -272,8 +369,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       tags: 'React, TypeScript, Automation',
       featured: false,
     });
-    setUploadFiles([]);
-    setUploadPreview([]);
+    setUploadFile(null);
+    setUploadPreview(null);
+    setExistingMedia(null);
     setIsNewProjectModalOpen(true);
   };
 
@@ -835,11 +933,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div className="space-y-3">
                       <div className="aspect-[16/9] rounded-lg overflow-hidden bg-black/40 relative">
                         {p.media[0] ? (
-                          <img
-                            src={p.media[0].path}
-                            alt={p.title}
-                            className="w-full h-full object-cover"
-                          />
+                          p.media[0].type === 'video' || /\.(mp4|webm)$/i.test(p.media[0].path) ? (
+                            <video
+                              src={p.media[0].path}
+                              muted
+                              playsInline
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <img
+                              src={p.media[0].path}
+                              alt={p.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-600 text-xs font-mono">
                             NO PREVIEW
@@ -848,6 +955,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-mono text-[#0EA5E9]">
                           {p.category}
                         </span>
+                        {p.media[0] && (p.media[0].type === 'video' || /\.(mp4|webm)$/i.test(p.media[0].path)) && (
+                          <span className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded bg-black/80 border border-white/10 text-[9px] font-mono text-white">
+                            VIDEO
+                          </span>
+                        )}
                         {p.featured && (
                           <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#EA580C] text-[10px] font-bold text-white">
                             FEATURED
@@ -1247,25 +1359,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ═════════════════════════════════════════════════ */}
           {activeTab === 'email' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
                 <div>
                   <h2 className="text-xl font-heading font-bold text-white">
-                    Email Notifications Settings
+                    Email Notifications & Delivery Engine
                   </h2>
                   <p className="text-xs text-slate-400">
-                    Configure recipient inbox for client leads and test SMTP deliverability.
+                    Configure your notification inbox and outbound SMTP server for project leads.
                   </p>
+                </div>
+
+                {/* Delivery Engine Status Badge */}
+                <div className="flex items-center gap-2">
+                  {appData.settings?.smtp?.host && appData.settings?.smtp?.user && appData.settings?.smtp?.pass ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>SMTP Active ({appData.settings.smtp.host})</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 text-[#0EA5E9] text-xs font-mono">
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>Automated Email Relay Active</span>
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <form onSubmit={handleSaveEmailSettings} className="space-y-4 max-w-xl">
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300 block">
-                    Admin Notification Email
-                  </label>
+              <form onSubmit={handleSaveEmailSettings} className="space-y-6 max-w-2xl">
+                {/* 1. Recipient Notification Email */}
+                <div className="p-5 rounded-2xl bg-[#060D1A] border border-white/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-mono font-bold text-white uppercase tracking-wider block">
+                      Admin Notification Inbox <span className="text-[#0EA5E9]">*</span>
+                    </label>
+                    <span className="text-[11px] font-mono text-emerald-400">Primary Alert Target</span>
+                  </div>
                   <input
                     type="email"
                     required
+                    placeholder="e.g. anoopkp10@gmail.com"
                     value={appData.settings?.notifyEmail || ''}
                     onChange={e =>
                       setAppData(prev => ({
@@ -1276,30 +1408,161 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         },
                       }))
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[#060D1A] border border-white/10 text-xs text-white"
+                    className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#0EA5E9]"
                   />
-                  <span className="text-[11px] text-slate-500">
-                    Lead alerts will be delivered immediately to this address.
-                  </span>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Whenever a client clicks <strong>"Submit Project Requirements"</strong>, an immediate project alert with full specs and contact details is delivered to this email address.
+                  </p>
                 </div>
 
+                {/* 2. SMTP Delivery Configuration */}
+                <div className="p-5 rounded-2xl bg-[#060D1A] border border-white/10 space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                        Outbound SMTP Server (Optional / Recommended)
+                      </h3>
+                      <p className="text-[11px] text-slate-400">
+                        Connect your Gmail, Outlook, or Google Workspace to send directly from your own domain.
+                      </p>
+                    </div>
+
+                    {/* Quick Presets */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-mono text-slate-500 mr-1">Presets:</span>
+                      <button
+                        type="button"
+                        onClick={() => applySmtpPreset('gmail')}
+                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-mono text-slate-300 transition-colors"
+                      >
+                        Gmail
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => applySmtpPreset('office365')}
+                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-mono text-slate-300 transition-colors"
+                      >
+                        Outlook
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => applySmtpPreset('zoho')}
+                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-mono text-slate-300 transition-colors"
+                      >
+                        Zoho
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-2 space-y-1">
+                      <label className="text-[11px] font-mono text-slate-300 block">
+                        SMTP Host Server
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. smtp.gmail.com"
+                        value={appData.settings?.smtp?.host || ''}
+                        onChange={e => updateSmtpField('host', e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#0EA5E9]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-mono text-slate-300 block">
+                        Port
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="465 or 587"
+                        value={appData.settings?.smtp?.port ?? 465}
+                        onChange={e => updateSmtpField('port', Number(e.target.value) || 465)}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#0EA5E9]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-mono text-slate-300 block">
+                        SMTP Username / Email
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="your-email@gmail.com"
+                        value={appData.settings?.smtp?.user || ''}
+                        onChange={e => updateSmtpField('user', e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#0EA5E9]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-mono text-slate-300 block">
+                          SMTP Password / App Password
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowSmtpPass(p => !p)}
+                          className="text-[10px] font-mono text-[#0EA5E9] hover:underline flex items-center gap-1"
+                        >
+                          {showSmtpPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                          <span>{showSmtpPass ? 'Hide' : 'Show'}</span>
+                        </button>
+                      </div>
+                      <input
+                        type={showSmtpPass ? 'text' : 'password'}
+                        placeholder="••••••••••••••••"
+                        value={appData.settings?.smtp?.pass || ''}
+                        onChange={e => updateSmtpField('pass', e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#0EA5E9]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={appData.settings?.smtp?.secure ?? true}
+                        onChange={e => updateSmtpField('secure', e.target.checked)}
+                        className="w-4 h-4 rounded text-[#0EA5E9]"
+                      />
+                      <span className="text-xs text-slate-300">
+                        Use SSL/TLS Encryption (Recommended for Port 465)
+                      </span>
+                    </label>
+
+                    <a
+                      href="https://myaccount.google.com/apppasswords"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-[#0EA5E9] hover:underline flex items-center gap-1"
+                    >
+                      <span>Gmail App Password Help</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Submit & Test Buttons */}
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white text-xs font-bold hover:shadow-lg disabled:opacity-50 transition-all"
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white text-xs font-bold hover:shadow-lg disabled:opacity-50 transition-all flex items-center gap-2"
                   >
-                    Save Email Configuration
+                    <span>{saving ? 'Saving...' : 'Save Email Configuration'}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleSendTestEmail}
                     disabled={testEmailLoading}
-                    className="px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 transition-colors flex items-center gap-2"
                   >
                     <Mail className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                    <span>{testEmailLoading ? 'Sending Test...' : 'Send Test Email'}</span>
+                    <span>{testEmailLoading ? 'Dispatching Test...' : `Send Test to ${appData.settings?.notifyEmail || 'Configured Email'}`}</span>
                   </button>
                 </div>
               </form>
@@ -1391,26 +1654,94 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 />
               </div>
 
-              {/* Upload Media Files */}
+              {/* Upload Media: 1 Image or 1 Video */}
               <div className="space-y-2">
-                <label className="text-xs font-mono text-slate-300 block">
-                  Media Files (Images or MP4 Videos)
-                </label>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*,video/mp4"
-                  onChange={handleFileChange}
-                  className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
-                />
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-mono text-slate-300 block">
+                    Project Media (1 Image or 1 MP4/WEBM Video) *
+                  </label>
+                  <span className="text-[11px] font-mono text-slate-500">
+                    Saved in uploads folder & path saved to appdata.json
+                  </span>
+                </div>
 
-                {uploadPreview.length > 0 && (
-                  <div className="flex gap-2 pt-2 overflow-x-auto">
-                    {uploadPreview.map((src, idx) => (
-                      <div key={idx} className="w-16 h-12 rounded-lg overflow-hidden border border-white/20">
-                        <img src={src} alt="Upload preview" className="w-full h-full object-cover" />
+                {/* If a new file is chosen */}
+                {uploadPreview ? (
+                  <div className="p-4 rounded-xl bg-[#060D1A] border border-[#0EA5E9]/50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-mono text-[#0EA5E9] font-bold flex items-center gap-1.5">
+                        <span>New {uploadPreview.type === 'video' ? 'Video' : 'Image'} Selected:</span>
+                        <span className="text-white">{uploadPreview.name}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleClearSelectedFile}
+                        className="text-xs font-mono text-red-400 hover:text-red-300 underline"
+                      >
+                        Remove / Reselect
+                      </button>
+                    </div>
+                    <div className="rounded-xl overflow-hidden max-h-56 bg-black flex items-center justify-center border border-white/10">
+                      {uploadPreview.type === 'video' ? (
+                        <video src={uploadPreview.url} controls className="w-full max-h-56 object-contain" />
+                      ) : (
+                        <img src={uploadPreview.url} alt="Preview" className="w-full max-h-56 object-contain" />
+                      )}
+                    </div>
+                  </div>
+                ) : existingMedia ? (
+                  /* If editing with existing saved media */
+                  <div className="p-4 rounded-xl bg-[#060D1A] border border-white/10 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-mono text-slate-400">
+                        Current Media ({existingMedia.type}): <span className="text-white">{existingMedia.path}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold">
+                        SAVED IN APPDATA
+                      </span>
+                    </div>
+                    <div className="rounded-xl overflow-hidden max-h-52 bg-black flex items-center justify-center border border-white/5">
+                      {existingMedia.type === 'video' || /\.(mp4|webm)$/i.test(existingMedia.path) ? (
+                        <video src={existingMedia.path} controls className="w-full max-h-52 object-contain" />
+                      ) : (
+                        <img
+                          src={existingMedia.path}
+                          alt={existingMedia.alt || 'Saved preview'}
+                          className="w-full max-h-52 object-contain"
+                        />
+                      )}
+                    </div>
+                    <div className="pt-2 border-t border-white/5">
+                      <label className="block text-xs font-mono text-slate-300 mb-1.5">
+                        Upload a new file to replace current media:
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*,video/mp4,video/webm"
+                        onChange={handleSingleFileChange}
+                        className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  /* If new project with no file yet */
+                  <div className="border-2 border-dashed border-white/15 hover:border-[#0EA5E9]/50 rounded-xl p-6 text-center space-y-3 transition-colors bg-[#060D1A]/50">
+                    <Upload className="w-8 h-8 text-slate-400 mx-auto" />
+                    <div className="space-y-1">
+                      <div className="text-xs font-semibold text-white">
+                        Upload 1 Image (JPG, PNG, WEBP, GIF) or Video (MP4, WEBM)
                       </div>
-                    ))}
+                      <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                        File is saved into public/uploads/portfolio/ and the path stored in appdata.json.
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      required={!editingItem}
+                      accept="image/*,video/mp4,video/webm"
+                      onChange={handleSingleFileChange}
+                      className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
+                    />
                   </div>
                 )}
               </div>

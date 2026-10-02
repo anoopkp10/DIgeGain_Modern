@@ -224,8 +224,8 @@ app.get('/api/assistant', async (req, res) => {
 app.post('/api/contact-form', async (req, res) => {
   const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
 
-  // 1. IP Rate Limiting (5 requests per 10 minutes)
-  const rate = checkRateLimit(`contact:${clientIp}`, 5, 10 * 60 * 1000);
+  // 1. IP Rate Limiting (30 requests per 10 minutes for testing & clients)
+  const rate = checkRateLimit(`contact:${clientIp}`, 30, 10 * 60 * 1000);
   if (!rate.allowed) {
     return res.status(429).json({
       error: `Too many submissions. Please wait ${Math.ceil(rate.resetInMs / 60000)} minutes before trying again.`,
@@ -276,14 +276,20 @@ app.post('/api/contact-form', async (req, res) => {
   try {
     await addLead(leadData);
     const appData = await readAppData();
+    const recipientEmail = appData.settings.notifyEmail?.trim() || 'anoopkp10@gmail.com';
 
-    // 4. Send Client Confirmation Email
-    const clientSend = await sendClientConfirmation(leadData, appData.contact);
+    // 4. Send Client Confirmation Email (using configured SMTP if available)
+    const clientSend = await sendClientConfirmation(leadData, appData.contact, appData.settings.smtp);
 
-    // 5. Send Admin Notification Email
-    const adminSend = await sendAdminNotification(leadData, appData.contact, appData.settings.notifyEmail);
+    // 5. Send Admin Notification Email directly to configured email
+    const adminSend = await sendAdminNotification(
+      leadData,
+      appData.contact,
+      recipientEmail,
+      appData.settings.smtp
+    );
 
-    // 6. Update lead status in background
+    // 6. Update lead status with exact email dispatch status
     await updateLead(leadId, {
       emailStatus: {
         clientConfirmation: clientSend.success ? 'sent' : 'failed',
@@ -294,8 +300,9 @@ app.post('/api/contact-form', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Thank you! Your inquiry has been received. Our engineering team will get back to you within 24 hours.',
+      message: `Thank you, ${name}! Your project requirements have been received and a notification has been sent to ${recipientEmail}. Our engineering team will respond within 24 hours.`,
       leadId,
+      recipient: recipientEmail,
     });
   } catch (err: any) {
     console.error('Contact form submission error:', err);
@@ -412,15 +419,24 @@ async function savePortfolioForm(
   if (itemId && !existing) throw new Error('Portfolio item not found');
 
   const title = String(body.title ?? existing?.title ?? '').trim();
-  const retainedMedia = parsePortfolioJson(body.existingMedia, existing?.media ?? []);
+  const rawRetained = parsePortfolioJson(body.existingMedia, existing?.media ?? []);
+  const retainedMedia = Array.isArray(rawRetained)
+    ? rawRetained
+    : rawRetained ? [rawRetained] : [];
+
   const uploadedMedia = files.map(file => {
     const isVideo = file.mimetype.startsWith('video/');
     return {
       type: isVideo ? 'video' as const : 'image' as const,
       path: `/uploads/portfolio/${isVideo ? 'videos' : 'images'}/${file.filename}`,
-      alt: path.parse(file.originalname).name,
+      alt: title || path.parse(file.originalname).name,
     };
   });
+
+  // Strictly enforce one uploaded image/video per item through admin
+  const finalMedia = uploadedMedia.length > 0
+    ? [uploadedMedia[0]]
+    : retainedMedia.slice(0, 1);
 
   const item = PortfolioItemSchema.parse({
     id: itemId || body.id || `prj-${Date.now()}`,
@@ -431,8 +447,8 @@ async function savePortfolioForm(
     clientName: body.clientName ?? existing?.clientName ?? '',
     projectUrl: body.projectUrl ?? existing?.projectUrl ?? '',
     tags: parsePortfolioJson(body.tags, existing?.tags ?? []),
-    media: [...retainedMedia, ...uploadedMedia],
-    coverIndex: Number(body.coverIndex ?? existing?.coverIndex ?? 0),
+    media: finalMedia,
+    coverIndex: 0,
     featured: body.featured === undefined
       ? existing?.featured ?? false
       : body.featured === true || body.featured === 'true',
@@ -457,7 +473,7 @@ app.put(['/api/admin/contact', '/api/contact'], requireAdmin, async (req, res) =
   }
 });
 
-app.post(['/api/admin/portfolio', '/api/portfolio'], requireAdmin, upload.array('media', 20), async (req, res) => {
+app.post(['/api/admin/portfolio', '/api/portfolio'], requireAdmin, upload.any() as any, async (req, res) => {
   const files = (req.files as Express.Multer.File[] | undefined) || [];
   try {
     const saved = await savePortfolioForm(req.body, files);
@@ -468,7 +484,7 @@ app.post(['/api/admin/portfolio', '/api/portfolio'], requireAdmin, upload.array(
   }
 });
 
-app.put(['/api/admin/portfolio/:id', '/api/portfolio/:id'], requireAdmin, upload.array('media', 20), async (req, res) => {
+app.put(['/api/admin/portfolio/:id', '/api/portfolio/:id'], requireAdmin, upload.any() as any, async (req, res) => {
   const files = (req.files as Express.Multer.File[] | undefined) || [];
   try {
     const saved = await savePortfolioForm(req.body, files, req.params.id);
@@ -489,7 +505,7 @@ app.delete(['/api/admin/portfolio/:id', '/api/portfolio/:id'], requireAdmin, asy
   }
 });
 
-app.post(['/api/admin/upload', '/api/upload'], requireAdmin, upload.single('file'), async (req, res) => {
+app.post(['/api/admin/upload', '/api/upload'], requireAdmin, upload.single('file') as any, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -580,8 +596,9 @@ app.post(['/api/admin/leads/:id/resend', '/api/leads/:id/resend'], requireAdmin,
     if (!lead) return res.status(404).json({ error: 'Lead not found' });
 
     const appData = await readAppData();
-    const clientSend = await sendClientConfirmation(lead, appData.contact);
-    const adminSend = await sendAdminNotification(lead, appData.contact, appData.settings.notifyEmail);
+    const recipientEmail = appData.settings.notifyEmail?.trim() || 'anoopkp10@gmail.com';
+    const clientSend = await sendClientConfirmation(lead, appData.contact, appData.settings.smtp);
+    const adminSend = await sendAdminNotification(lead, appData.contact, recipientEmail, appData.settings.smtp);
 
     const updated = await updateLead(lead.id, {
       emailStatus: {
@@ -635,34 +652,35 @@ app.put(['/api/admin/settings', '/api/settings'], requireAdmin, async (req, res)
 
 app.post(['/api/admin/test-email', '/api/test-email'], requireAdmin, async (req, res) => {
   try {
-    const smtpCheck = await verifySmtp();
-    if (!smtpCheck.ok) {
-      return res.status(400).json({ success: false, message: smtpCheck.message });
-    }
-
     const appData = await readAppData();
+    const recipient = req.body.email || appData.settings.notifyEmail || 'anoopkp10@gmail.com';
+
     const dummyLead = {
-      id: 'test-lead-001',
-      name: 'DIGEGAIN Test Lead',
-      email: req.body.email || appData.settings.notifyEmail || 'anoopkp10@gmail.com',
-      phone: '+91 98470 12345',
-      service: 'Booking System Test',
-      budget: '₹1,00,000',
-      message: 'This is a test notification verifying that DIGEGAIN SMTP delivery is functioning.',
+      id: `test-lead-${Date.now().toString(36)}`,
+      name: 'DIGEGAIN Deliverability Test',
+      email: recipient,
+      phone: '+91 99612 25385',
+      service: 'Web System Deliverability Verification',
+      budget: 'Verified Test',
+      message: 'This is a test notification verifying that DIGEGAIN lead alerts are delivered directly to your configured inbox.',
       source: 'contact-form' as const,
       emailStatus: { clientConfirmation: 'pending' as const, adminNotification: 'pending' as const, error: '' },
       status: 'new' as const,
       createdAt: new Date().toISOString(),
     };
 
-    const adminSend = await sendAdminNotification(dummyLead, appData.contact, dummyLead.email);
+    const adminSend = await sendAdminNotification(dummyLead, appData.contact, recipient, appData.settings.smtp);
     if (!adminSend.success) {
-      return res.status(500).json({ success: false, message: adminSend.error });
+      return res.status(500).json({ success: false, message: adminSend.error || 'Failed to dispatch test email' });
     }
 
-    res.json({ success: true, message: `Test email successfully sent to ${dummyLead.email}` });
+    const deliveryChannel = adminSend.method === 'smtp' ? 'configured SMTP server' : 'automated email relay';
+    res.json({
+      success: true,
+      message: `Test email successfully dispatched to ${recipient} (via ${deliveryChannel}). Please check your inbox.`,
+    });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message || 'SMTP test failed' });
+    res.status(500).json({ success: false, message: err.message || 'Email delivery test failed' });
   }
 });
 

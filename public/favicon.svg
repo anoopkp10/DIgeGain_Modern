@@ -1,22 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 210" width="210" height="210">
   <defs>
-    <linearGradient id="oG" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="gOrangeTop" x1="0%" y1="0%" x2="100%" y2="80%">
       <stop offset="0%" stop-color="#FFB300" />
-      <stop offset="100%" stop-color="#E65100" />
+      <stop offset="45%" stop-color="#FF7A00" />
+      <stop offset="100%" stop-color="#FF4500" />
     </linearGradient>
-    <linearGradient id="bG" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#29B6F6" />
-      <stop offset="100%" stop-color="#0277BD" />
+    <linearGradient id="gOrangeMid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6A00" />
+      <stop offset="55%" stop-color="#FF4E00" />
+      <stop offset="100%" stop-color="#DE3700" />
     </linearGradient>
-    <linearGradient id="gG" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#81C784" />
-      <stop offset="100%" stop-color="#2E7D32" />
+    <linearGradient id="gBlue" x1="0%" y1="20%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#0047BA" />
+      <stop offset="50%" stop-color="#0066CC" />
+      <stop offset="100%" stop-color="#007AE6" />
+    </linearGradient>
+    <linearGradient id="gGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#009638" />
+      <stop offset="50%" stop-color="#00A843" />
+      <stop offset="100%" stop-color="#22C55E" />
     </linearGradient>
   </defs>
-  <g transform="translate(50, 50) scale(0.42)">
-    <path d="M -75 -48 C -70 -72, -35 -92, 15 -88 C 65 -82, 85 -50, 75 -22 C 60 -12, 40 -20, 20 -28 C -25 -45, -55 -40, -75 -48 Z" fill="url(#oG)" />
-    <path d="M -85 -10 C -85 -30, -50 -55, 10 -52 C 60 -50, 92 -20, 95 15 C 80 18, 55 10, 25 -2 C -20 -18, -60 -5, -85 -10 Z" fill="url(#bG)" />
-    <path d="M -92 18 C -90 -2, -60 -25, -10 -22 C 45 -18, 88 5, 96 35 C 75 42, 35 30, -15 15 C -55 5, -80 20, -92 18 Z" fill="#1565C0" />
-    <path d="M -80 45 C -65 20, -20 5, 30 18 C 75 30, 95 62, 70 85 C 50 82, 20 68, -25 50 C -55 38, -75 48, -80 45 Z" fill="url(#gG)" />
+
+  <g transform="translate(105, 105)">
+    <!-- 1. Top Yellow/Orange Flame Ribbon -->
+    <path
+      d="M -30 -80 C -10 -94, 20 -98, 50 -82 C 36 -70, 14 -72, -8 -68 C -22 -64, -28 -72, -30 -80 Z"
+      fill="url(#gOrangeTop)"
+    />
+
+    <!-- 2. Mid Orange Sweeping Ribbon -->
+    <path
+      d="M -82 -40 C -70 -72, -26 -90, 18 -84 C 62 -76, 88 -48, 80 -18 C 64 -10, 38 -20, 12 -28 C -28 -40, -64 -34, -82 -40 Z"
+      fill="url(#gOrangeMid)"
+    />
+
+    <!-- 3. Central Deep Blue Swirling Ribbon -->
+    <path
+      d="M -94 -2 C -92 -24, -48 -48, 8 -46 C 58 -44, 90 -16, 98 16 C 82 20, 50 10, 18 0 C -24 -14, -68 -2, -94 -2 Z"
+      fill="url(#gBlue)"
+    />
+
+    <!-- 3b. Center-Lower Royal Blue Swoop -->
+    <path
+      d="M -100 26 C -92 4, -56 -16, -4 -12 C 48 -8, 90 14, 98 40 C 76 46, 34 34, -18 20 C -62 8, -88 26, -100 26 Z"
+      fill="#005BBA"
+    />
+
+    <!-- 4. Bottom Green Rising Ribbon -->
+    <path
+      d="M -85 52 C -66 26, -18 10, 28 22 C 76 34, 96 68, 70 92 C 50 86, 22 72, -24 52 C -54 38, -78 54, -85 52 Z"
+      fill="url(#gGreen)"
+    />
+
+    <!-- 5. Lower Emerald Leaf Ribbon -->
+    <path
+      d="M -50 86 C -24 74, 12 70, 54 82 C 62 88, 44 98, 8 96 C -24 94, -44 90, -50 86 Z"
+      fill="#009638"
+    />
   </g>
 </svg>

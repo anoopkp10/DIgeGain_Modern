@@ -10,7 +10,7 @@ import { Footer } from './components/Footer.tsx';
 import { Hero } from './components/Hero.tsx';
 import { HomeSections } from './components/HomeSections.tsx';
 import { PortfolioPage } from './components/PortfolioPage.tsx';
-import { ContactPage } from './components/ContactPage.tsx';
+import { ContactPage, SubmittedInquiry } from './components/ContactPage.tsx';
 import { AdminLogin } from './components/admin/AdminLogin.tsx';
 import { AdminDashboard } from './components/admin/AdminDashboard.tsx';
 import { CustomCursor } from './components/ui/CustomCursor.tsx';
@@ -27,6 +27,38 @@ export default function App() {
   const [adminUser, setAdminUser] = useState<string | null>(null);
   const [preselectedService, setPreselectedService] = useState<string>('');
   const [preloaderDone, setPreloaderDone] = useState(false);
+
+  // Retain submitted inquiry across navigations, tab switches, and page refreshes
+  const [submittedInquiry, setSubmittedInquiry] = useState<SubmittedInquiry | null>(() => {
+    try {
+      const local = localStorage.getItem('digegain_submitted_inquiry');
+      if (local) return JSON.parse(local);
+    } catch {}
+    try {
+      const session = sessionStorage.getItem('digegain_submitted_inquiry');
+      if (session) return JSON.parse(session);
+    } catch {}
+    return null;
+  });
+
+  const handleSubmittedInquiryChange = (inquiry: SubmittedInquiry | null) => {
+    setSubmittedInquiry(inquiry);
+    if (inquiry) {
+      try {
+        localStorage.setItem('digegain_submitted_inquiry', JSON.stringify(inquiry));
+      } catch {}
+      try {
+        sessionStorage.setItem('digegain_submitted_inquiry', JSON.stringify(inquiry));
+      } catch {}
+    } else {
+      try {
+        localStorage.removeItem('digegain_submitted_inquiry');
+      } catch {}
+      try {
+        sessionStorage.removeItem('digegain_submitted_inquiry');
+      } catch {}
+    }
+  };
 
   // Fetch initial app data
   useEffect(() => {
@@ -210,7 +242,10 @@ export default function App() {
         {currentPath === '/contact' && (
           <ContactPage
             contact={appData.contact}
+            configuredEmail={appData.settings?.notifyEmail || 'anoopkp10@gmail.com'}
             preselectedService={preselectedService}
+            submittedInquiry={submittedInquiry}
+            onSubmittedInquiryChange={handleSubmittedInquiryChange}
             onNavigate={navigate}
           />
         )}

@@ -113,9 +113,20 @@ export const AssistantSchema = z.object({
   leadCaptureEnabled: z.boolean().default(true),
 });
 
+export const SmtpConfigSchema = z.object({
+  host: z.string().default(''),
+  port: z.union([z.number(), z.string()]).transform(v => Number(v) || 587).default(587),
+  user: z.string().default(''),
+  pass: z.string().default(''),
+  secure: z.boolean().default(false),
+  fromEmail: z.string().default(''),
+  fromName: z.string().default('DIGEGAIN Web Systems'),
+}).optional();
+
 export const SettingsSchema = z.object({
-  notifyEmail: z.string().email().or(z.string()).default('anoopkp10@gmail.com'),
+  notifyEmail: z.string().default('anoopkp10@gmail.com'),
   siteUrl: z.string().default('https://digegain.com'),
+  smtp: SmtpConfigSchema,
 });
 
 export const AppDataSchema = z.object({
@@ -133,6 +144,7 @@ export type LeadData = z.infer<typeof LeadSchema>;
 export type Lead = LeadData;
 export type AssistantData = z.infer<typeof AssistantSchema>;
 export type AssistantExtraKnowledge = z.infer<typeof AssistantExtraKnowledgeSchema>;
+export type SmtpConfig = z.infer<typeof SmtpConfigSchema>;
 export type SettingsData = z.infer<typeof SettingsSchema>;
 export type AppData = z.infer<typeof AppDataSchema>;
 

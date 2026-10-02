@@ -207,6 +207,40 @@
   ],
   "leads": [
     {
+      "id": "lead-1790877095695-rzcs",
+      "name": "Anoop K P",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+919961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "Testing email dispatch to configured email and thank you screen retention",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)"
+      },
+      "status": "new",
+      "createdAt": "2026-10-01T17:51:35.695Z"
+    },
+    {
+      "id": "lead-1790876692186-bnc5",
+      "name": "Anoop",
+      "email": "anoopkp10@gmail.com",
+      "phone": "9847012345",
+      "service": "Booking System",
+      "budget": "",
+      "message": "Test project",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "failed",
+        "error": "Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)"
+      },
+      "status": "new",
+      "createdAt": "2026-10-01T17:44:52.186Z"
+    },
+    {
       "id": "lead-1790760076268-lsi4",
       "name": "kuttappan",
       "email": "anoopkp10@gmail.com",
