@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Logo } from './Logo.tsx';
 
 interface PreloaderProps {
@@ -9,17 +9,22 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const [count, setCount] = useState(0);
   const [isFading, setIsFading] = useState(false);
   const [hasCompleted, setHasCompleted] = useState(false);
+  // Latest callback ref: effect runs once per mount (empty deps) so parent
+  // re-renders (e.g. form submit) can never replay the intro animation.
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     // Check if user already saw preloader in this session
     if (sessionStorage.getItem('digegain_preloaded') === 'true') {
-      onComplete();
+      onCompleteRef.current();
       setHasCompleted(true);
       return;
     }
 
     const duration = 1200; // 1.2s rapid counter
     const startTime = performance.now();
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const update = (time: number) => {
       const elapsed = time - startTime;
@@ -32,16 +37,19 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       } else {
         sessionStorage.setItem('digegain_preloaded', 'true');
         setIsFading(true);
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           setHasCompleted(true);
-          onComplete();
+          onCompleteRef.current();
         }, 500);
       }
     };
 
     const animId = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(animId);
-  }, [onComplete]);
+    return () => {
+      cancelAnimationFrame(animId);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, []);
 
   const handleSkip = () => {
     sessionStorage.setItem('digegain_preloaded', 'true');

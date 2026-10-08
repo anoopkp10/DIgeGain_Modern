@@ -81,7 +81,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
     message: '',
     submitted: false,
     loading: false,
+    error: '',
   });
+  // Prevent double-submit (double-click / StrictMode double-invoke)
+  const leadSubmittingRef = useRef(false);
 
   // Voice Conversation States
   const [isListening, setIsListening] = useState(false);
@@ -404,41 +407,59 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!leadFormState.name || !leadFormState.email) return;
+    e.stopPropagation();
+    // Single-fire guard: ignore double-click / StrictMode second invoke
+    if (leadSubmittingRef.current || leadFormState.loading) return;
+    if (!leadFormState.name.trim() || !leadFormState.email.trim()) {
+      setLeadFormState(prev => ({ ...prev, error: 'Please enter your name and email.' }));
+      return;
+    }
 
-    setLeadFormState(prev => ({ ...prev, loading: true }));
+    leadSubmittingRef.current = true;
+    setLeadFormState(prev => ({ ...prev, loading: true, error: '' }));
     try {
       const res = await fetch('/api/contact-form', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: leadFormState.name,
-          email: leadFormState.email,
-          phone: leadFormState.phone,
+          name: leadFormState.name.trim(),
+          email: leadFormState.email.trim(),
+          phone: leadFormState.phone.trim(),
           service: 'AI Assistant Qualified Lead',
-          message: leadFormState.message || 'Captured from DIGEGAIN AI Chat Widget',
+          message:
+            leadFormState.message.trim() ||
+            `AI chat inquiry from ${leadFormState.name.trim()} (${leadFormState.email.trim()}) requesting project details.`,
           source: 'ai-assistant',
         }),
       });
 
-      if (res.ok) {
-        setLeadFormState(prev => ({ ...prev, submitted: true, loading: false }));
-        const confirmationText = `Thank you, **${leadFormState.name}**! Your project details have been sent to our lead engineer. We've sent a confirmation email to **${leadFormState.email}** and will contact you within 24 hours.`;
-        setMessages(prev => [
-          ...prev,
-          {
-            id: `sys-${Date.now()}`,
-            role: 'assistant',
-            content: confirmationText,
-          },
-        ]);
-        if (autoSpeak) {
-          speakMessage(`sys-${Date.now()}`, confirmationText);
-        }
-        setTimeout(() => setShowLeadForm(false), 2000);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Submission failed');
       }
-    } catch {
-      setLeadFormState(prev => ({ ...prev, loading: false }));
+
+      // Inline chat confirmation only — no navigation, no page reload.
+      const submittedName = leadFormState.name.trim();
+      const submittedEmail = leadFormState.email.trim();
+      setLeadFormState({ name: '', email: '', phone: '', message: '', submitted: true, loading: false, error: '' });
+      const confirmationText = `Thank you, **${submittedName}**! Your project details have been sent to our lead engineer. We've sent a confirmation email to **${submittedEmail}** and will contact you within 24 hours.`;
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `sys-${Date.now()}`,
+          role: 'assistant',
+          content: confirmationText,
+        },
+      ]);
+      if (autoSpeak) {
+        speakMessage(`sys-${Date.now()}`, confirmationText);
+      }
+      setTimeout(() => setShowLeadForm(false), 2000);
+    } catch (err: any) {
+      // Stay in chat: show error inline, keep form open with values intact
+      setLeadFormState(prev => ({ ...prev, loading: false, error: err?.message || 'Submission failed. Please try again.' }));
+    } finally {
+      leadSubmittingRef.current = false;
     }
   };
 
@@ -851,6 +872,16 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
                   onChange={e => setLeadFormState(prev => ({ ...prev, phone: e.target.value }))}
                   className="w-full px-3 py-1.5 rounded-lg bg-[#060D1A] border border-white/10 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9]"
                 />
+                <textarea
+                  placeholder="Briefly describe your project (Optional)"
+                  rows={2}
+                  value={leadFormState.message}
+                  onChange={e => setLeadFormState(prev => ({ ...prev, message: e.target.value }))}
+                  className="w-full px-3 py-1.5 rounded-lg bg-[#060D1A] border border-white/10 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-[#0EA5E9] resize-none"
+                />
+                {leadFormState.error && (
+                  <p className="text-[11px] text-rose-400 font-semibold">{leadFormState.error}</p>
+                )}
                 <button
                   type="submit"
                   disabled={leadFormState.loading}

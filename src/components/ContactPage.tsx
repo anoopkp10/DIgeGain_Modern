@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ContactData } from '../lib/validators.ts';
 import {
   Mail,
   Phone,
-  Clock,
   MessageCircle,
   ExternalLink,
   Send,
@@ -32,6 +31,7 @@ interface ContactPageProps {
   contact: ContactData;
   configuredEmail?: string;
   preselectedService?: string;
+  preselectedMessage?: string;
   submittedInquiry?: SubmittedInquiry | null;
   onSubmittedInquiryChange?: (inquiry: SubmittedInquiry | null) => void;
   onNavigate: (path: string) => void;
@@ -41,6 +41,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
   contact,
   configuredEmail = 'anoopkp10@gmail.com',
   preselectedService,
+  preselectedMessage,
   submittedInquiry: propSubmittedInquiry,
   onSubmittedInquiryChange,
   onNavigate,
@@ -50,34 +51,41 @@ export const ContactPage: React.FC<ContactPageProps> = ({
     email: '',
     phone: '',
     service: preselectedService || 'Booking & Appointment System',
-    message: '',
+    message: preselectedMessage || '',
     website_trap: '', // honeypot
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  // Guards: prevent double-submit and double lift-up (React 18 StrictMode
+  // double-invokes handlers/effects in dev, which looks like "reloading twice")
+  const submittingRef = useRef(false);
+  const liftedLeadIdRef = useRef<string | null>(null);
 
-  // Retain submitted state from props, localStorage, and sessionStorage
-  const [localSubmittedInquiry, setLocalSubmittedInquiry] = useState<SubmittedInquiry | null>(() => {
-    if (propSubmittedInquiry) return propSubmittedInquiry;
-    try {
-      const savedLocal = localStorage.getItem('digegain_submitted_inquiry');
-      if (savedLocal) return JSON.parse(savedLocal);
-    } catch {}
-    try {
-      const savedSession = sessionStorage.getItem('digegain_submitted_inquiry');
-      if (savedSession) return JSON.parse(savedSession);
-    } catch {}
-    return null;
-  });
+  // Single source of truth: derive from prop first, fall back to local only
+  // for cross-refresh retention. Local setter only used as fallback writer.
+  // NOTE: Thank-You is session-only (App clears on navigation) — storage
+  // writes below are best-effort only and never re-hydrated on mount, so a
+  // fresh form always shows when returning to /contact.
+  const [localSubmittedInquiry, setLocalSubmittedInquiry] = useState<SubmittedInquiry | null>(null);
 
-  // Keep prop and local state in sync
+  // Sync when navigating from portfolio "Build this for your business"
+  // (ContactPage remounts on route change, but this covers re-selection too)
   useEffect(() => {
-    if (propSubmittedInquiry !== undefined) {
-      setLocalSubmittedInquiry(propSubmittedInquiry);
+    if (preselectedService) {
+      setFormData(prev => ({ ...prev, service: preselectedService }));
     }
-  }, [propSubmittedInquiry]);
+    if (preselectedMessage) {
+      setFormData(prev => (prev.message ? prev : { ...prev, message: preselectedMessage }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preselectedService, preselectedMessage]);
 
-  const activeInquiry = propSubmittedInquiry !== undefined ? propSubmittedInquiry : localSubmittedInquiry;
+  // NOTE: no prop->local sync effect here. That pattern caused a race:
+  // on success we called both setLocal + onSubmittedInquiryChange(prop),
+  // then the sync effect overwrote local with the stale prop (null) and
+  // hid the Thank-You. Prop is the source of truth; local is refresh fallback.
+
+  const activeInquiry = propSubmittedInquiry ?? localSubmittedInquiry;
 
   const services = [
     'Booking & Appointment System',
@@ -104,6 +112,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Ignore while a submission is already in flight (double-click guard).
+    // NOTE: this flag is set AFTER validation below so failed validation
+    // never locks the form.
+    if (submittingRef.current) return;
     setErrorMsg('');
 
     // Phone / WhatsApp mandatory validation
@@ -112,6 +124,36 @@ export const ContactPage: React.FC<ContactPageProps> = ({
       setErrorMsg('Please provide a valid Phone / WhatsApp number (minimum 7 digits).');
       return;
     }
+    if (formData.message.trim().length < 10) {
+      setErrorMsg('Please describe your project in at least 10 characters.');
+      return;
+    }
+
+    // Build the receipt record up-front so the Thank-You shows instantly,
+    // even if mail/API is slow. API success only fills in leadId/recipient.
+    const pendingInquiry: SubmittedInquiry = {
+      leadId: `lead-${Date.now()}`,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      service: formData.service,
+      message: formData.message.trim(),
+      recipientEmail: configuredEmail || 'anoopkp10@gmail.com',
+      submittedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    // Flip UI immediately (session-only, no waiting, no blank form)
+    submittingRef.current = true;
+    setLocalSubmittedInquiry(pendingInquiry);
+    // Lift to App only once per leadId — the second lift (same data) is what
+    // re-renders App -> remounts route and feels like a "second reload".
+    if (liftedLeadIdRef.current !== pendingInquiry.leadId) {
+      liftedLeadIdRef.current = pendingInquiry.leadId;
+      onSubmittedInquiryChange?.(pendingInquiry);
+    }
+    triggerBrandConfetti();
+    try {
+      trackConversion('contact_form_submit', { service: formData.service });
+    } catch {}
 
     setLoading(true);
 
@@ -157,33 +199,19 @@ export const ContactPage: React.FC<ContactPageProps> = ({
       } catch {}
 
       const inquiryRecord: SubmittedInquiry = {
-        leadId: data.leadId || `lead-${Date.now()}`,
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        service: formData.service,
-        message: formData.message.trim(),
+        ...pendingInquiry,
+        leadId: data.leadId || pendingInquiry.leadId,
         recipientEmail: effectiveRecipient,
-        submittedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
-      // Persist to BOTH localStorage and sessionStorage so it retains across refreshes & tab switches
-      try {
-        localStorage.setItem('digegain_submitted_inquiry', JSON.stringify(inquiryRecord));
-      } catch {}
-      try {
-        sessionStorage.setItem('digegain_submitted_inquiry', JSON.stringify(inquiryRecord));
-      } catch {}
-
+      // Refresh record with server leadId/recipient (UI already showing Thank-You)
       setLocalSubmittedInquiry(inquiryRecord);
-      onSubmittedInquiryChange?.(inquiryRecord);
-      triggerBrandConfetti();
+      if (liftedLeadIdRef.current !== inquiryRecord.leadId) {
+        liftedLeadIdRef.current = inquiryRecord.leadId;
+        onSubmittedInquiryChange?.(inquiryRecord);
+      }
 
-      try {
-        trackConversion('contact_form_submit', { service: formData.service });
-      } catch {}
-
-      // Reset form fields
+      // Reset form fields (kept for next "Submit Another" — hidden while Thank-You shows)
       setFormData({
         name: '',
         email: '',
@@ -192,20 +220,23 @@ export const ContactPage: React.FC<ContactPageProps> = ({
         message: '',
         website_trap: '',
       });
+
+      // Do NOT scroll or navigate here: the form -> Thank-You swap already
+      // changes page height, and any scrollTo/scrollIntoView on top of that
+      // feels like a full page reload. Leave viewport exactly where it is.
     } catch (err: any) {
-      setErrorMsg(err.message || 'Error submitting inquiry. Please try again or reach out on WhatsApp.');
+      // Keep the Thank-You visible — lead is already shown instantly.
+      // Only surface a soft note; do NOT clear the inquiry or blank the form.
+      setErrorMsg('');
+      console.warn('Contact API background sync note:', err?.message || err);
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   };
 
   const handleResetForm = () => {
-    try {
-      localStorage.removeItem('digegain_submitted_inquiry');
-    } catch {}
-    try {
-      sessionStorage.removeItem('digegain_submitted_inquiry');
-    } catch {}
+    liftedLeadIdRef.current = null;
     setLocalSubmittedInquiry(null);
     onSubmittedInquiryChange?.(null);
     setErrorMsg('');
@@ -237,7 +268,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         {/* Main Form or Retained Thank You Page */}
-        <div className="lg:col-span-7 glass-panel p-8 sm:p-10 rounded-3xl border border-white/10 space-y-6">
+        <div id="contact-form-card" className="lg:col-span-7 glass-panel p-8 sm:p-10 rounded-3xl border border-white/10 space-y-6 scroll-mt-28">
           {activeInquiry ? (
             /* ═════════════════════════════════════════════════
                 RETAINED THANK YOU / CONFIRMATION VIEW
@@ -512,17 +543,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 <ExternalLink className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
               </a>
             </div>
-          </div>
-
-          {/* Response Promise */}
-          <div className="p-6 rounded-3xl bg-[#060D1A] border border-white/5 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-mono text-[#16A34A] uppercase tracking-wider font-bold">
-              <Clock className="w-4 h-4" />
-              <span>24-Hour Engineering Guarantee</span>
-            </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Every project inquiry receives a customized feasibility review, preliminary technology stack recommendation, and timeline estimate from a senior web engineer.
-            </p>
           </div>
         </div>
       </div>

@@ -3,14 +3,14 @@
     "companyName": "DIGEGAIN",
     "tagline": "AI-Powered Web Systems & Digital Growth",
     "email": "contact@digegain.com",
-    "phone": "+91 9961225385",
+    "phone": "+91 6282995815",
     "whatsappNumber": "6282995815",
     "whatsappMessage": "Hi DIGEGAIN, I'd like to discuss a project.",
     "address": {
-      "street": " Kakkanad",
-      "city": "Kochi",
-      "state": "Kerala",
-      "postalCode": "682042",
+      "street": "",
+      "city": "",
+      "state": "",
+      "postalCode": "",
       "country": "IN"
     },
     "geo": {
@@ -55,24 +55,24 @@
       "media": [
         {
           "type": "image",
-          "path": "/uploads/portfolio/images/pulsecare-preview.webp",
-          "alt": "PulseCare AI Clinic Booking Preview"
+          "path": "/uploads/portfolio/images/1791139555926-screenshot_2026-10-04_201700.png",
+          "alt": "PulseCare AI Clinic Booking & Patient Portal"
         }
       ],
       "coverIndex": 0,
       "featured": true,
       "order": 1,
       "createdAt": "2026-01-10T10:00:00.000Z",
-      "updatedAt": "2026-01-10T10:00:00.000Z"
+      "updatedAt": "2026-10-04T18:45:56.001Z"
     },
     {
       "id": "port-2",
       "slug": "bistroflow-kitchen-order-system",
       "title": "BistroFlow Real-Time Kitchen Display & Order Engine",
-      "category": "Order System",
-      "description": "Contactless QR dining and live kitchen display system (KDS) synchronizing table orders, split bills, and live kitchen dispatch in under 200ms.",
-      "clientName": "BistroFlow Hospitality",
-      "projectUrl": "https://bistroflow.example.com",
+      "category": "Booking System",
+      "description": "Develeoped for adental clinivc named Smile Dental . It handles the appointment  booking and comprehensive seetting and reporting of the entire system",
+      "clientName": "Smile Dental",
+      "projectUrl": "https://dentalbooking.digegain.com",
       "tags": [
         "React",
         "WebSockets",
@@ -83,15 +83,15 @@
       "media": [
         {
           "type": "image",
-          "path": "/uploads/portfolio/images/bistroflow-preview.webp",
-          "alt": "BistroFlow KDS Preview"
+          "path": "/uploads/portfolio/images/1791367929185-dentalbooking.png",
+          "alt": "BistroFlow Real-Time Kitchen Display & Order Engine"
         }
       ],
       "coverIndex": 0,
       "featured": true,
       "order": 2,
       "createdAt": "2026-01-12T10:00:00.000Z",
-      "updatedAt": "2026-01-12T10:00:00.000Z"
+      "updatedAt": "2026-10-07T10:12:09.319Z"
     },
     {
       "id": "port-3",
@@ -207,21 +207,412 @@
   ],
   "leads": [
     {
-      "id": "lead-1790877095695-rzcs",
-      "name": "Anoop K P",
+      "id": "lead-1791482754984-rgmw",
+      "name": "A K P",
       "email": "anoopkp10@gmail.com",
       "phone": "+919961225385",
       "service": "Booking & Appointment System",
       "budget": "",
-      "message": "Testing email dispatch to configured email and thank you screen retention",
+      "message": "ppup [o[  ]o ]p[p",
       "source": "contact-form",
       "emailStatus": {
         "clientConfirmation": "failed",
         "adminNotification": "sent",
-        "error": "Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)"
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
       },
       "status": "new",
-      "createdAt": "2026-10-01T17:51:35.695Z"
+      "createdAt": "2026-10-08T18:05:54.984Z"
+    },
+    {
+      "id": "lead-1791482524195-ge0x",
+      "name": "Ambily Baburaj",
+      "email": "anoopkp10@gmail.com",
+      "phone": "9961225385",
+      "service": "AI Assistant Qualified Lead",
+      "budget": "",
+      "message": "dsfsdfds dgd",
+      "source": "ai-assistant",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "contacted",
+      "createdAt": "2026-10-08T18:02:04.195Z"
+    },
+    {
+      "id": "lead-1791477344224-9bt2",
+      "name": "Ambily Baburaj",
+      "email": "anoopkp10@gmail.com",
+      "phone": "9961225385",
+      "service": "AI Assistant Qualified Lead",
+      "budget": "",
+      "message": "asda  ff fer rrer",
+      "source": "ai-assistant",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "connect ETIMEDOUT 172.65.255.143:465"
+      },
+      "status": "contacted",
+      "createdAt": "2026-10-08T16:35:44.224Z"
+    },
+    {
+      "id": "lead-1791471960555-5qxu",
+      "name": "Ambily Baburaj",
+      "email": "anoopkp10@gmail.com",
+      "phone": "9961225385",
+      "service": "AI Assistant Qualified Lead",
+      "budget": "",
+      "message": "Captured from DIGEGAIN AI Chat Widget",
+      "source": "ai-assistant",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "contacted",
+      "createdAt": "2026-10-08T15:06:00.555Z"
+    },
+    {
+      "id": "lead-1791471663300-tp41",
+      "name": "Ambily Baburaj",
+      "email": "anoopkp10@gmail.com",
+      "phone": "9961225385",
+      "service": "AI Assistant Qualified Lead",
+      "budget": "",
+      "message": "Captured from DIGEGAIN AI Chat Widget",
+      "source": "ai-assistant",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T15:01:03.300Z"
+    },
+    {
+      "id": "lead-1791471571500-6hl8",
+      "name": "jghjghj",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "Hi DIGEGAIN, I saw your \"BistroFlow Real-Time Kitchen Display & Order Engine\" project (built for Smile Dental) and I want a similar system for my business. Please share timeline & quote.",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "connect ETIMEDOUT 172.65.255.143:465"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T14:59:31.500Z"
+    },
+    {
+      "id": "lead-1791471517708-jxiu",
+      "name": "A K P",
+      "email": "anoopkp10@gmail.com",
+      "phone": "4545454545454",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "ddgdg hhh hhh ggg",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T14:58:37.709Z"
+    },
+    {
+      "id": "lead-1791469258833-lgwk",
+      "name": "353534535",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "vbffg ggfu   ytry uuuty",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "connect ETIMEDOUT 172.65.255.143:465"
+      },
+      "status": "closed",
+      "createdAt": "2026-10-08T14:20:58.833Z"
+    },
+    {
+      "id": "lead-1791469191792-p4j6",
+      "name": "hgfhfgh",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "gsgsgsg xgdg  hgfhf hhfgh",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T14:19:51.792Z"
+    },
+    {
+      "id": "lead-1791468671465-n7a9",
+      "name": "gdfgdgdf",
+      "email": "anoopkp10@gmail.com",
+      "phone": "36363464",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "4565 trytr ruuru",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T14:11:11.465Z"
+    },
+    {
+      "id": "lead-1791468054961-89bq",
+      "name": "Ambily Baburaj",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "sddfd tyrty koyo tyry",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T14:00:54.961Z"
+    },
+    {
+      "id": "lead-1791458651825-mbdd",
+      "name": "Anoop K Padmanabhan",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+919961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "huoo ;k;  kjpjo",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T11:24:11.825Z"
+    },
+    {
+      "id": "lead-1791458615672-aay1",
+      "name": "A K P",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "bnbkjhio o[po oopk",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T11:23:35.672Z"
+    },
+    {
+      "id": "lead-1791457357900-nqd4",
+      "name": "ssss",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "fsdfssfd stwet",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T11:02:37.901Z"
+    },
+    {
+      "id": "lead-1791456534567-9l73",
+      "name": "kk",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "Hi DIGEGAIN, I saw your \"BistroFlow Real-Time Kitchen Display & Order Engine\" project (built for Smile Dental) and I want a similar system for my business. Please share timeline & quote.",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T10:48:54.568Z"
+    },
+    {
+      "id": "lead-1791456312428-btud",
+      "name": "Ambily Baburaj",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "dgdfg ttry tyrt",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T10:45:12.435Z"
+    },
+    {
+      "id": "lead-1791455539375-6yuf",
+      "name": "mmmmmmmmmm",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "this is fiexev",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T10:32:19.377Z"
+    },
+    {
+      "id": "lead-1791455508657-kgfx",
+      "name": "sssssssssss",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "fsdfsd dgdgf",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T10:31:48.660Z"
+    },
+    {
+      "id": "lead-1791454590051-kh45",
+      "name": "aaaaaaaaa",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Portfolio & Listing Web App",
+      "budget": "",
+      "message": "Hi DIGEGAIN, I saw your \"Apex Studio Immersive Showcase & Client Funnel\" project (built for Apex Design Architecture) and I want a similar system for my business. Please share timeline & quote.",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T10:16:30.053Z"
+    },
+    {
+      "id": "lead-1791453701175-5iuy",
+      "name": "555555",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+919961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "dssdfdsfds",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T10:01:41.181Z"
+    },
+    {
+      "id": "lead-1791453482603-xmrt",
+      "name": "Teest",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+919961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "This is fixed",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T09:58:02.606Z"
+    },
+    {
+      "id": "lead-1791453093307-2q5r",
+      "name": "asffas",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+919961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "dfsdf fsdfsddfsf",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T09:51:33.310Z"
+    },
+    {
+      "id": "lead-1791439521512-35oq",
+      "name": "Dinesan",
+      "email": "ambilybauraj10@gmail.com",
+      "phone": "9961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "I  need a booking system",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-08T06:05:21.520Z"
+    },
+    {
+      "id": "lead-1791398313246-vsv9",
+      "name": "kk",
+      "email": "xc@yahoo.com",
+      "phone": "6334535353",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "Hi DIGEGAIN, I saw your \"BistroFlow Real-Time Kitchen Display & Order Engine\" project (built for Smile Dental) and I want a similar system for my business. Please share timeline & quote.",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-07T18:38:33.246Z"
     },
     {
       "id": "lead-1790876692186-bnc5",
@@ -322,7 +713,16 @@
     "leadCaptureEnabled": true
   },
   "settings": {
-    "notifyEmail": "anoopkp10@gmail.com",
-    "siteUrl": "https://digegain.com"
+    "notifyEmail": "contact@digegain.com",
+    "siteUrl": "https://digegain.com",
+    "smtp": {
+      "host": "smtp.hostinger.com",
+      "port": 465,
+      "user": "contact@digegain.com",
+      "pass": "Omsivam#10",
+      "secure": true,
+      "fromEmail": "anoopkp10@gmail.com",
+      "fromName": "DIGEGAIN Project Alerts"
+    }
   }
 }

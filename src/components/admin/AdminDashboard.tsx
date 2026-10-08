@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppData,
   ContactData,
@@ -18,7 +18,6 @@ import {
   Plus,
   Trash2,
   Edit2,
-  ExternalLink,
   CheckCircle2,
   AlertCircle,
   Upload,
@@ -190,8 +189,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  // Fetch full private settings (public /api/appdata intentionally strips
+  // notifyEmail + smtp, so admin must load them via the protected endpoint)
+  const fetchEmailSettings = async () => {
+    try {
+      const res = await fetch('/api/admin/settings', {
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        const settings = await res.json();
+        setAppData(prev => ({
+          ...prev,
+          settings: {
+            ...prev.settings,
+            ...settings,
+            smtp: settings.smtp ?? prev.settings.smtp,
+          },
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch email settings:', err);
+    }
+  };
+
+  // Fetch full private assistant config (public /api/appdata strips
+  // private knowledge, so admin must load it via the protected endpoint)
+  const fetchAssistantConfig = async () => {
+    try {
+      const res = await fetch('/api/admin/assistant', {
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        const assistant = await res.json();
+        setAppData(prev => ({
+          ...prev,
+          assistant: {
+            ...prev.assistant,
+            ...assistant,
+            suggestedQuestions: assistant.suggestedQuestions ?? prev.assistant.suggestedQuestions,
+            extraKnowledge: assistant.extraKnowledge ?? prev.assistant.extraKnowledge,
+          },
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch assistant config:', err);
+    }
+  };
+
   useEffect(() => {
     fetchLeads();
+    fetchEmailSettings();
+    fetchAssistantConfig();
   }, []);
 
   // ═════════════════════════════════════════════════
@@ -379,6 +429,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // LEADS ACTIONS
   // ═════════════════════════════════════════════════
   const handleUpdateLeadStatus = async (id: string, status: 'new' | 'contacted' | 'closed') => {
+    // Optimistic update: flip the dropdown immediately for instant feedback.
+    const prevStatus = leads.find(l => l.id === id)?.status;
+    setLeads(prev => prev.map(l => (l.id === id ? { ...l, status } : l)));
+
     try {
       const res = await fetch(`/api/admin/leads/${id}`, {
         method: 'PATCH',
@@ -391,9 +445,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       });
       if (!res.ok) throw new Error('Failed to update status');
 
-      setLeads(prev => prev.map(l => (l.id === id ? { ...l, status } : l)));
       showToast(`Lead status updated to ${status}`);
     } catch (err: any) {
+      // Roll back to the previous status so the UI never shows a phantom save.
+      if (prevStatus) {
+        setLeads(prev => prev.map(l => (l.id === id ? { ...l, status: prevStatus } : l)));
+      }
       showToast(err.message, 'error');
     }
   };
@@ -519,32 +576,68 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }));
   };
 
-  const addKnowledgeItem = () => {
-    const question = window.prompt('Knowledge Question (e.g., What is your cancellation policy?):');
-    if (!question) return;
-    const answer = window.prompt('Answer grounded for AI:');
-    if (!answer) return;
-
-    setAppData(prev => ({
-      ...prev,
-      assistant: {
-        ...prev.assistant,
-        extraKnowledge: [
-          ...(prev.assistant.extraKnowledge || []),
-          { id: `k-${Date.now()}`, question, answer, public: true },
-        ],
+  // Persist assistant immediately (used by knowledge add/remove so items are
+  // saved + visible even before pressing "Save AI Settings")
+  const persistAssistant = async (assistant: AssistantData) => {
+    const res = await fetch('/api/admin/assistant', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
       },
-    }));
+      credentials: 'include',
+      body: JSON.stringify(assistant),
+    });
+    if (!res.ok) throw new Error('Failed to save knowledge base');
+    const result = await res.json();
+    const saved = result.assistant || assistant;
+    setAppData(prev => {
+      const updatedData = { ...prev, assistant: saved };
+      onAppDataUpdate(updatedData);
+      return updatedData;
+    });
+    return saved;
   };
 
-  const removeKnowledgeItem = (index: number) => {
-    setAppData(prev => ({
-      ...prev,
-      assistant: {
-        ...prev.assistant,
-        extraKnowledge: (prev.assistant.extraKnowledge || []).filter((_, i) => i !== index),
-      },
-    }));
+  const addKnowledgeItem = async () => {
+    const question = window.prompt('Knowledge Question (e.g., What is your cancellation policy?):');
+    if (!question?.trim()) return;
+    const answer = window.prompt('Answer grounded for AI:');
+    if (!answer?.trim()) return;
+
+    const next: AssistantData = {
+      ...appData.assistant,
+      extraKnowledge: [
+        ...(appData.assistant.extraKnowledge || []),
+        { id: `k-${Date.now()}`, question: question.trim(), answer: answer.trim(), public: true },
+      ],
+    };
+    // Optimistic UI update
+    setAppData(prev => ({ ...prev, assistant: next }));
+    try {
+      await persistAssistant(next);
+      showToast('Knowledge added & saved!');
+    } catch (err: any) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const removeKnowledgeItem = async (index: number) => {
+    if (!window.confirm('Remove this knowledge item?')) return;
+    const next: AssistantData = {
+      ...appData.assistant,
+      extraKnowledge: (appData.assistant.extraKnowledge || []).filter((_, i) => i !== index),
+    };
+    const prevKnowledge = appData.assistant.extraKnowledge;
+    setAppData(prev => ({ ...prev, assistant: next }));
+    try {
+      await persistAssistant(next);
+      showToast('Knowledge removed & saved!');
+    } catch (err: any) {
+      // Rollback on failure
+      setAppData(prev => ({ ...prev, assistant: { ...prev.assistant, extraKnowledge: prevKnowledge } }));
+      showToast(err.message, 'error');
+    }
   };
 
   // ═════════════════════════════════════════════════
@@ -1533,15 +1626,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </span>
                     </label>
 
-                    <a
-                      href="https://myaccount.google.com/apppasswords"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-[#0EA5E9] hover:underline flex items-center gap-1"
-                    >
-                      <span>Gmail App Password Help</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
                   </div>
                 </div>
 

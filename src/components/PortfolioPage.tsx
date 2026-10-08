@@ -7,7 +7,7 @@ import { Search, Sparkles, ArrowRight, ShieldCheck, Zap, Layers, X } from 'lucid
 interface PortfolioPageProps {
   portfolio: PortfolioItem[];
   onNavigate: (path: string) => void;
-  onSelectService: (service: string) => void;
+  onSelectService: (service: string, message?: string) => void;
 }
 
 export const PortfolioPage: React.FC<PortfolioPageProps> = ({
@@ -227,8 +227,23 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({
       <ProjectDetailModal
         item={activeItem}
         onClose={() => setActiveItem(null)}
-        onNavigateToContact={service => {
-          onSelectService(service);
+        onNavigateToContact={selectedItem => {
+          // Map portfolio category -> contact-page service dropdown value
+          const categoryToService: Record<string, string> = {
+            'Booking System': 'Booking & Appointment System',
+            'Order System': 'Order & E-Commerce Management System',
+            'Portfolio Website': 'Portfolio & Listing Web App',
+            Dashboard: 'Admin Dashboard & Analytics',
+            Other: 'Custom Web Architecture',
+          };
+          const service =
+            categoryToService[selectedItem.category] || 'Custom Web Architecture';
+          const preselectedMessage =
+            `Hi DIGEGAIN, I saw your "${selectedItem.title}" project` +
+            (selectedItem.clientName ? ` (built for ${selectedItem.clientName})` : '') +
+            ` and I want a similar system for my business. Please share timeline & quote.`;
+          setActiveItem(null);
+          onSelectService(service, preselectedMessage);
           onNavigate('/contact');
         }}
       />

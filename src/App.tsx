@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AppData } from './lib/validators.ts';
 import {
   generateOrganizationJsonLd,
@@ -26,39 +26,40 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [adminUser, setAdminUser] = useState<string | null>(null);
   const [preselectedService, setPreselectedService] = useState<string>('');
+  const [preselectedMessage, setPreselectedMessage] = useState<string>('');
   const [preloaderDone, setPreloaderDone] = useState(false);
+  // Stable callback: inline `() => setPreloaderDone(true)` creates a new fn
+  // every App render, which re-triggers Preloader's useEffect (dep: onComplete)
+  // and replays the intro loader on unrelated state changes (e.g. form submit).
+  const handlePreloaderComplete = useCallback(() => {
+    setPreloaderDone(true);
+  }, []);
+  // Ref mirror of currentPath so navigate() never uses a stale closure value
+  const currentPathRef = useRef(currentPath);
+  useEffect(() => {
+    currentPathRef.current = currentPath;
+  }, [currentPath]);
 
-  // Retain submitted inquiry across navigations, tab switches, and page refreshes
-  const [submittedInquiry, setSubmittedInquiry] = useState<SubmittedInquiry | null>(() => {
-    try {
-      const local = localStorage.getItem('digegain_submitted_inquiry');
-      if (local) return JSON.parse(local);
-    } catch {}
-    try {
-      const session = sessionStorage.getItem('digegain_submitted_inquiry');
-      if (session) return JSON.parse(session);
-    } catch {}
-    return null;
-  });
+  // Submitted inquiry: session-only. Shows Thank-You right after submit,
+  // clears when user navigates away (or clicks "Submit Another") so the
+  // contact page always opens with a fresh form. NOT persisted to storage.
+  const [submittedInquiry, setSubmittedInquiry] = useState<SubmittedInquiry | null>(null);
 
   const handleSubmittedInquiryChange = (inquiry: SubmittedInquiry | null) => {
     setSubmittedInquiry(inquiry);
-    if (inquiry) {
-      try {
-        localStorage.setItem('digegain_submitted_inquiry', JSON.stringify(inquiry));
-      } catch {}
-      try {
-        sessionStorage.setItem('digegain_submitted_inquiry', JSON.stringify(inquiry));
-      } catch {}
-    } else {
-      try {
-        localStorage.removeItem('digegain_submitted_inquiry');
-      } catch {}
-      try {
-        sessionStorage.removeItem('digegain_submitted_inquiry');
-      } catch {}
-    }
   };
+
+  // Clear Thank-You ONLY on real navigation away from /contact.
+  // Depends on currentPath alone: setting submittedInquiry does NOT re-run
+  // this, so the Thank-You survives submit and clears on next route change.
+  const prevPathRef = useRef(currentPath);
+  useEffect(() => {
+    if (prevPathRef.current === '/contact' && currentPath !== '/contact') {
+      setSubmittedInquiry(null);
+    }
+    prevPathRef.current = currentPath;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPath]);
 
   // Fetch initial app data
   useEffect(() => {
@@ -158,9 +159,14 @@ export default function App() {
   }, [currentPath, appData]);
 
   const navigate = (path: string) => {
+    // Guard: same-path navigation (e.g. /contact -> /contact) remounts the
+    // route and feels like a full page reload — skip it and keep state.
+    if (path === currentPathRef.current) {
+      return;
+    }
     if (path.startsWith('/#')) {
       const hash = path.substring(1);
-      if (currentPath !== '/') {
+      if (currentPathRef.current !== '/') {
         window.history.pushState({}, '', '/');
         setCurrentPath('/');
         setTimeout(() => {
@@ -211,7 +217,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-[#060D1A] text-[#EAF3FF] selection:bg-[#0284C7]/30 selection:text-[#0EA5E9] relative">
       {/* Preloader intro */}
-      <Preloader onComplete={() => setPreloaderDone(true)} />
+      <Preloader onComplete={handlePreloaderComplete} />
 
       {/* Emotion Agency Custom Cursor */}
       <CustomCursor />
@@ -235,7 +241,12 @@ export default function App() {
           <PortfolioPage
             portfolio={appData.portfolio}
             onNavigate={navigate}
-            onSelectService={service => setPreselectedService(service)}
+            onSelectService={(service, message) => {
+              setPreselectedService(service);
+              if (message !== undefined) setPreselectedMessage(message);
+              // Start a fresh inquiry so the preselected portfolio details show in the form
+              handleSubmittedInquiryChange(null);
+            }}
           />
         )}
 
@@ -244,6 +255,7 @@ export default function App() {
             contact={appData.contact}
             configuredEmail={appData.settings?.notifyEmail || 'anoopkp10@gmail.com'}
             preselectedService={preselectedService}
+            preselectedMessage={preselectedMessage}
             submittedInquiry={submittedInquiry}
             onSubmittedInquiryChange={handleSubmittedInquiryChange}
             onNavigate={navigate}
