@@ -35,6 +35,30 @@ interface Message {
 }
 
 // Clean markdown syntax so spoken voice sounds natural
+// Detect whether the page is currently in light theme mode
+function useIsLight(): boolean {
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    const check = () => {
+      setIsLight(
+        document.documentElement.classList.contains('light') ||
+          !document.documentElement.classList.contains('dark'),
+      );
+    };
+    check();
+    window.addEventListener('resize', check);
+    window.addEventListener('storage', check);
+    return () => {
+      window.removeEventListener('resize', check);
+      window.removeEventListener('storage', check);
+    };
+  }, []);
+
+  return isLight;
+}
+
+
 function stripMarkdownForSpeech(text: string): string {
   return text
     .replace(/```[\s\S]*?```/g, '') // remove multi-line code blocks
@@ -85,6 +109,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   });
   // Prevent double-submit (double-click / StrictMode double-invoke)
   const leadSubmittingRef = useRef(false);
+
+  // Theme detection (used to pick the correct assistant message bubble style)
+  const isLight = useIsLight();
 
   // Voice Conversation States
   const [isListening, setIsListening] = useState(false);
@@ -716,15 +743,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
                     }`}
                   >
                     <div
-                      className={`px-3.5 py-2.5 rounded-2xl ${
-                        m.role === 'user'
-                          ? 'bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white rounded-br-none shadow-md shadow-[#0284C7]/20 font-medium'
-                          : `bg-[#091829] text-slate-200 border rounded-bl-none shadow-sm leading-relaxed transition-colors ${
-                              isSpeakingThis
-                                ? 'border-[#0EA5E9]/60 shadow-md shadow-[#0284C7]/20'
-                                : 'border-white/10'
-                            }`
-                      }`}
+                      className={`px-3.5 py-2.5 rounded-2xl ${m.role === 'user' ? 'bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white rounded-br-none shadow-md shadow-[#0284C7]/20 font-medium' : `${isLight ? 'bg-white text-[#0B1B2E] border border-[#0284C7]/20 shadow-sm leading-relaxed transition-colors' : 'bg-[#091829] text-slate-200 border rounded-bl-none shadow-sm leading-relaxed transition-colors'} ${isSpeakingThis ? 'border-[#0EA5E9]/60 shadow-md shadow-[#0284C7]/20' : 'border-white/10'}`}`}
                     >
                       {m.content ? (
                         formatMarkdown(m.content)

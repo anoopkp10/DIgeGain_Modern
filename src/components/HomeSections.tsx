@@ -215,6 +215,9 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
               <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
                 Whether you operate a high-volume outpatient clinic, a bustling salon suite, a dining destination, or a boutique consultancy, we craft digital platforms that save operational hours, captivate high-value clients, and scale revenue predictably.
               </p>
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-medium">
+                We provide services worldwide.
+              </p>
             </div>
 
             {/* Quick Facts Block (as required by prompt context) */}
@@ -235,10 +238,6 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
                 <div className="flex justify-between pb-3 border-b border-white/5">
                   <span className="text-slate-500">Industries Served:</span>
                   <span className="text-white font-semibold">Clinics, Salons, Dining, B2B</span>
-                </div>
-                <div className="flex justify-between pb-3 border-b border-white/5">
-                  <span className="text-slate-500">Core Technologies:</span>
-                  <span className="text-white font-semibold">TypeScript, React, Node, WebGL</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Optimization Standards:</span>

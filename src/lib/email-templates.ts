@@ -47,7 +47,7 @@ export function renderClientConfirmationEmail(lead: LeadData, contact: ContactDa
     </div>
     <div class="body">
       <h2>Hello ${safeName},</h2>
-      <p>Thank you for reaching out to <strong>DIGEGAIN</strong>. We have received your project inquiry and our technical strategy team is reviewing your requirements.</p>
+      <p>Thank you for reaching out to <strong>DIGEGAIN</strong>. We have received your project inquiry and our technical team is reviewing your requirements.</p>
       
       <div class="summary-card">
         <div class="summary-row"><span class="summary-label">Service:</span> <span class="summary-value">${safeService}</span></div>
@@ -55,7 +55,7 @@ export function renderClientConfirmationEmail(lead: LeadData, contact: ContactDa
         <div class="summary-row"><span class="summary-label">Your message:</span> <span class="summary-value">${safeMessage}</span></div>
       </div>
 
-      <p><strong>What to expect next:</strong> Our lead engineer will get back to you within 24 hours with a preliminary scope, suggested architecture, and scheduling options.</p>
+      <p><strong>What to expect next:</strong> We will get back to you with a preliminary scope, suggested architecture, and scheduling options.</p>
 
       <div style="margin-top: 28px;">
         <a href="${waUrl}" class="btn btn-wa">Chat on WhatsApp</a>
