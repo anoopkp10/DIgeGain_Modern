@@ -11,7 +11,6 @@ import {
   ArrowRight,
   RotateCcw,
   FileText,
-  ShieldCheck,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { trackConversion } from '../lib/analytics.ts';
@@ -332,10 +331,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 text-[11px] font-mono text-emerald-400 pt-2">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Engineering review initiated. Expected turnaround: &lt; 24 hours.</span>
-                </div>
               </div>
 
               {/* Action Buttons */}

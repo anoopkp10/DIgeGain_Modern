@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { PortfolioItem } from '../lib/validators.ts';
 import { PortfolioCard } from './PortfolioCard.tsx';
 import { ProjectDetailModal } from './ProjectDetailModal.tsx';
-import { Search, Sparkles, ArrowRight, ShieldCheck, Zap, Layers, X } from 'lucide-react';
+import { Search, Sparkles, ArrowRight, X } from 'lucide-react';
 
 interface PortfolioPageProps {
   portfolio: PortfolioItem[];
@@ -90,38 +90,6 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({
           </p>
         </div>
 
-        {/* Quick Enterprise Metrics Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-          <div className="p-3.5 rounded-xl bg-[#060D1A] border border-white/10 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#0284C7]/20 flex items-center justify-center text-[#0EA5E9] flex-shrink-0">
-              <Zap className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white font-mono">&lt; 200ms Latency</div>
-              <div className="text-[11px] text-slate-400">Real-time sync</div>
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-[#060D1A] border border-white/10 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#16A34A]/20 flex items-center justify-center text-[#16A34A] flex-shrink-0">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white font-mono">100% Tailored</div>
-              <div className="text-[11px] text-slate-400">Zero template bloat</div>
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-[#060D1A] border border-white/10 flex items-center gap-3 col-span-2 sm:col-span-1">
-            <div className="w-8 h-8 rounded-lg bg-[#EA580C]/20 flex items-center justify-center text-[#EA580C] flex-shrink-0">
-              <Layers className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white font-mono">{portfolio.length} Systems Deployed</div>
-              <div className="text-[11px] text-slate-400">Healthcare, Dining & Salons</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Filter and Search Bar */}

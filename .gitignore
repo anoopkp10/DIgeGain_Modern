@@ -8,4 +8,7 @@ coverage/
 .env*
 !.env.example
 
+/_chrome-theme/
+
 /data/appdata.backup.json
+

@@ -165,7 +165,7 @@
   "assistant": {
     "enabled": true,
     "name": "DIGEGAIN AI",
-    "greeting": "Hi! I'm DIGEGAIN's AI assistant. Ask me about our services, our approach, or past projects.",
+    "greeting": "Hi! I'm DIGEGAIN AI. Ask me anything — our services, past projects, pricing process, or any general question!",
     "suggestedQuestions": ["What services do you offer?", "Show me your portfolio", "How can I contact you?"],
     "extraKnowledge": [],
     "leadCaptureEnabled": true

@@ -107,7 +107,7 @@ export const AssistantExtraKnowledgeSchema = z.object({
 export const AssistantSchema = z.object({
   enabled: z.boolean().default(true),
   name: z.string().default('DIGEGAIN AI'),
-  greeting: z.string().default("Hi! I'm DIGEGAIN's AI assistant. Ask me about our services, our approach, or past projects."),
+  greeting: z.string().default("Hi! I'm DIGEGAIN AI. Ask me anything — our services, past projects, pricing process, or any general question!"),
   suggestedQuestions: z.array(z.string()).default([]),
   extraKnowledge: z.array(AssistantExtraKnowledgeSchema).default([]),
   leadCaptureEnabled: z.boolean().default(true),

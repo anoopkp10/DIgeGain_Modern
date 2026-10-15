@@ -91,7 +91,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
         role: 'assistant',
         content:
           assistant.greeting ||
-          "Hi! I'm DIGEGAIN's AI assistant. Ask me about our web systems or past projects.",
+          "Hi! I'm DIGEGAIN AI. Ask me anything — our services, past projects, pricing process, or any general question!",
       },
     ];
   });

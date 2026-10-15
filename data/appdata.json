@@ -207,6 +207,23 @@
   ],
   "leads": [
     {
+      "id": "lead-1792076213393-kiwz",
+      "name": "sdfsdfsd",
+      "email": "anoopkp10@gmail.com",
+      "phone": "+319961225385",
+      "service": "Booking & Appointment System",
+      "budget": "",
+      "message": "Hi DIGEGAIN, I saw your \"PulseCare AI Clinic Booking & Patient Portal\" project (built for PulseCare Healthcare Network) and I want a similar system for my business. Please share timeline & quote.",
+      "source": "contact-form",
+      "emailStatus": {
+        "clientConfirmation": "failed",
+        "adminNotification": "sent",
+        "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <anoopkp10@gmail.com>: Sender address rejected: not owned by user contact@digegain.com"
+      },
+      "status": "new",
+      "createdAt": "2026-10-15T14:56:53.394Z"
+    },
+    {
       "id": "lead-1791482754984-rgmw",
       "name": "A K P",
       "email": "anoopkp10@gmail.com",
@@ -703,7 +720,7 @@
   "assistant": {
     "enabled": true,
     "name": "DIGEGAIN AI",
-    "greeting": "Hi! I'm DIGEGAIN's AI assistant. Ask me about our services, our approach, or past projects.",
+    "greeting": "Hi! I'm DIGEGAIN AI. Ask me anything — our services, past projects, pricing process, or any general question!",
     "suggestedQuestions": [
       "What services do you offer?",
       "Show me your portfolio",
