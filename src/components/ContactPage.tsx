@@ -171,31 +171,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
       const effectiveRecipient = data.recipient || configuredEmail || 'anoopkp10@gmail.com';
 
-      // 2. Client-side parallel automated email relay dispatch as secondary guarantee
-      try {
-        fetch(`https://formsubmit.co/ajax/${encodeURIComponent(effectiveRecipient)}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Referer: 'https://digegain.com',
-            Origin: 'https://digegain.com',
-          },
-          body: JSON.stringify({
-            _subject: `[DIGEGAIN New Lead] ${formData.name.trim()} – ${formData.service}`,
-            _replyto: formData.email.trim(),
-            _template: 'table',
-            'Lead Reference': data.leadId || `lead-${Date.now()}`,
-            'Client Name': formData.name.trim(),
-            'Client Email': formData.email.trim(),
-            'Phone / WhatsApp': formData.phone.trim(),
-            'Requested Web System': formData.service,
-            'Project Requirements': formData.message.trim(),
-            'Submitted Time': new Date().toLocaleString(),
-          }),
-          keepalive: true,
-        }).catch(() => {});
-      } catch {}
+      // Server (/api/contact-form -> sendAdminNotification) is the single source
+      // of admin email dispatch (SMTP with HTTP relay fallback). No client-side
+      // duplicate send here — that was causing admin to receive 2 mails.
 
       const inquiryRecord: SubmittedInquiry = {
         ...pendingInquiry,
