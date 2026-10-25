@@ -13,7 +13,7 @@ export function generateOrganizationJsonLd(data: AppData, siteUrl: string) {
     alternateName: ['DIGEGAIN Web Systems', 'DIGEGAIN Technologies'],
     legalName: 'DIGEGAIN',
     url: siteUrl,
-    logo: `${siteUrl}/logo/digegain-transparent.png`,
+    logo: `${siteUrl}/logo/digegain.svg`,
     image: `${siteUrl}/logo/digegain-transparent.png`,
     description: 'AI-powered digital growth company building websites, booking systems, order engines, and custom dashboards for service businesses.',
     telephone: c.phone,
