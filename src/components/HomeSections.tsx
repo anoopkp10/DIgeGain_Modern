@@ -204,16 +204,16 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
             <div className="lg:col-span-7 space-y-6">
               <h2 className="text-3xl sm:text-5xl font-heading font-extrabold text-white tracking-tight leading-tight">
-                We bridge high-performance web engineering with{' '}
+                Empowering Businesses with Next-Gen{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EA580C] via-[#0284C7] to-[#16A34A]">
-                  AI operational growth.
+                  AI Web Solutions & Digital Innovation.
                 </span>
               </h2>
               <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
-                Most service businesses are hindered by clunky third-party booking widgets, paper orders, or static websites that fail to convert. DIGEGAIN exists to replace that friction with custom, automated web engines tailored precisely to how your business operates.
+                We bridge the gap between imagination and digital execution. We are a forward-thinking digital agency specializing in modern, AI-powered web development and intelligent digital solutions. In an era where digital presence defines business success, we empower brands to stay ahead of the curve by building fast, scalable, and intelligent web platforms that drive real measurable results.
               </p>
               <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-                Whether you operate a high-volume outpatient clinic, a bustling salon suite, a dining destination, or a boutique consultancy, we craft digital platforms that save operational hours, captivate high-value clients, and scale revenue predictably.
+                We don't just build static websites; we create intelligent digital experiences engineered for performance and conversion. Our expertise blends modern web engineering with cutting-edge Artificial Intelligence.
               </p>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-medium">
                 We provide services worldwide.
@@ -400,9 +400,6 @@ export const HomeSections: React.FC<HomeSectionsProps> = ({ onNavigate, onSelect
       <section id="faq" className="relative py-20 px-6 sm:px-8 bg-[#060D1A] border-t border-white/5">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-2 font-mono text-xs text-[#16A34A] uppercase tracking-widest">
-              <span>Answer Engine Optimization (AEO)</span>
-            </div>
             <h2 className="text-3xl sm:text-5xl font-heading font-extrabold text-white tracking-tight">
               Frequently Asked Questions
             </h2>
