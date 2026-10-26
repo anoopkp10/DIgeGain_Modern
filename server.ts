@@ -702,8 +702,97 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     app.use(express.static(path.resolve(process.cwd(), 'dist')));
-    app.get('*', (req, res) => {
-      res.sendFile(path.resolve(process.cwd(), 'dist/index.html'));
+
+    // Route-specific SEO meta tags injected server-side so search engines
+    // and social scrapers see distinct <title>/<description>/OG tags per URL.
+    interface RouteMeta {
+      title: string;
+      description: string;
+      ogTitle: string;
+      ogDescription: string;
+      canonical: string;
+      twitterTitle: string;
+      twitterDescription: string;
+    }
+
+    const ROUTE_META: Record<string, RouteMeta> = {
+      '/': {
+        title: 'DIGEGAIN - AI-Powered Digital Growth & Web Systems',
+        description: 'DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses.',
+        ogTitle: 'DIGEGAIN - AI-Powered Digital Growth & Web Systems',
+        ogDescription: 'DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses.',
+        canonical: 'https://digegain.com/',
+        twitterTitle: 'DIGEGAIN - AI-Powered Digital Growth & Web Systems',
+        twitterDescription: 'DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses.',
+      },
+      '/portfolio': {
+        title: 'Portfolio & Case Studies | DIGEGAIN Web Systems',
+        description: 'Explore DIGEGAINs portfolio of booking systems, order management platforms, portfolio websites, and admin dashboards built for service businesses.',
+        ogTitle: 'Portfolio & Case Studies | DIGEGAIN Web Systems',
+        ogDescription: 'Explore DIGEGAINs portfolio of booking systems, order management platforms, portfolio websites, and admin dashboards built for service businesses.',
+        canonical: 'https://digegain.com/portfolio',
+        twitterTitle: 'Portfolio & Case Studies | DIGEGAIN Web Systems',
+        twitterDescription: 'Explore DIGEGAINs portfolio of booking systems, order management platforms, portfolio websites, and admin dashboards built for service businesses.',
+      },
+      '/contact': {
+        title: 'Contact DIGEGAIN | AI Web Development & Tech Solutions',
+        description: 'Get in touch with DIGEGAIN for custom web systems, booking platforms, order engines, and AI automation for your service business.',
+        ogTitle: 'Contact DIGEGAIN | AI Web Development & Tech Solutions',
+        ogDescription: 'Get in touch with DIGEGAIN for custom web systems, booking platforms, order engines, and AI automation for your service business.',
+        canonical: 'https://digegain.com/contact',
+        twitterTitle: 'Contact DIGEGAIN | AI Web Development & Tech Solutions',
+        twitterDescription: 'Get in touch with DIGEGAIN for custom web systems, booking platforms, order engines, and AI automation for your service business.',
+      },
+    };
+
+    const getRouteMeta = (pathname: string): RouteMeta => {
+      return ROUTE_META[pathname] || ROUTE_META['/'];
+    };
+
+    const injectMetaTags = (html: string, meta: RouteMeta): string => {
+      return html
+        .replace(/<title>[^<]*<\/title>/, `<title>${meta.title}</title>`)
+        .replace(
+          /<meta name="description" content="[^"]*" \/>/,
+          `<meta name="description" content="${meta.description}" />`
+        )
+        .replace(
+          /<meta property="og:title" content="[^"]*" \/>/,
+          `<meta property="og:title" content="${meta.ogTitle}" />`
+        )
+        .replace(
+          /<meta property="og:description" content="[^"]*" \/>/,
+          `<meta property="og:description" content="${meta.ogDescription}" />`
+        )
+        .replace(
+          /<meta property="og:url" content="[^"]*" \/>/,
+          `<meta property="og:url" content="${meta.canonical}" />`
+        )
+        .replace(
+          /<meta name="twitter:title" content="[^"]*" \/>/,
+          `<meta name="twitter:title" content="${meta.twitterTitle}" />`
+        )
+        .replace(
+          /<meta name="twitter:description" content="[^"]*" \/>/,
+          `<meta name="twitter:description" content="${meta.twitterDescription}" />`
+        )
+        .replace(
+          /<link rel="canonical" href="[^"]*" \/>/,
+          `<link rel="canonical" href="${meta.canonical}" />`
+        );
+    };
+
+    app.get('*', async (req, res) => {
+      try {
+        const html = await fs.readFile(
+          path.resolve(process.cwd(), 'dist/index.html'),
+          'utf-8'
+        );
+        const meta = getRouteMeta(req.url || '/');
+        res.send(injectMetaTags(html, meta));
+      } catch {
+        res.status(500).send('Internal Server Error');
+      }
     });
   }
 

@@ -115,16 +115,52 @@ export default function App() {
 
   // SEO, AEO & GEO: Dynamic Metadata & Schema.org JSON-LD Injection
   useEffect(() => {
-    // 1. Dynamic Page Titles for SEO
-    if (currentPath === '/portfolio') {
-      document.title = 'Portfolio & Case Studies | DIGEGAIN Web Systems';
-    } else if (currentPath === '/contact') {
-      document.title = 'Contact DIGEGAIN | AI Web Development & Tech Solutions';
-    } else if (currentPath === '/admin' || currentPath.startsWith('/admin/')) {
-      document.title = 'DIGEGAIN Admin Console';
-    } else {
-      document.title = 'DIGEGAIN - AI-Powered Digital Growth & Web Systems';
+    // 1. Dynamic Page Titles & Meta Tags for SEO
+    const meta: Record<string, { title: string; description: string; canonical: string }> = {
+      '/portfolio': {
+        title: 'Portfolio & Case Studies | DIGEGAIN Web Systems',
+        description: 'Explore DIGEGAINs portfolio of booking systems, order management platforms, portfolio websites, and admin dashboards built for service businesses.',
+        canonical: 'https://digegain.com/portfolio',
+      },
+      '/contact': {
+        title: 'Contact DIGEGAIN | AI Web Development & Tech Solutions',
+        description: 'Get in touch with DIGEGAIN for custom web systems, booking platforms, order engines, and AI automation for your service business.',
+        canonical: 'https://digegain.com/contact',
+      },
+      '/': {
+        title: 'DIGEGAIN - AI-Powered Digital Growth & Web Systems',
+        description: 'DIGEGAIN builds high-performance AI-powered booking systems, order management platforms, portfolio sites, and custom dashboards for growing service businesses.',
+        canonical: 'https://digegain.com/',
+      },
+    };
+
+    const routeMeta = meta[currentPath] ?? meta['/'];
+    document.title = routeMeta.title;
+
+    const setMeta = (name: string, value: string, attr = 'name') => {
+      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', value);
+    };
+
+    setMeta('description', routeMeta.description);
+    setMeta('og:title', routeMeta.title, 'property');
+    setMeta('og:description', routeMeta.description, 'property');
+    setMeta('og:url', routeMeta.canonical, 'property');
+    setMeta('twitter:title', routeMeta.title, 'name');
+    setMeta('twitter:description', routeMeta.description, 'name');
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
     }
+    canonical.href = routeMeta.canonical;
 
     // 2. Structured Data (JSON-LD) for Search Engines (SEO), Answer Engines (AEO), and Local Maps (GEO)
     if (!appData) return;
