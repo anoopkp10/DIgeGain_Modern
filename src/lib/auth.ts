@@ -27,8 +27,11 @@ export async function verifySessionToken(token: string): Promise<{ valid: boolea
 }
 
 export function validateAdminCredentials(user: string, pass: string): boolean {
-  const expectedUser = process.env.ADMIN_USERNAME || (process.env.NODE_ENV === 'production' ? '' : 'admin');
-  const expectedPass = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === 'production' ? '' : 'Digegain@2026!');
+  const expectedUser = process.env.ADMIN_USERNAME;
+  const expectedPass = process.env.ADMIN_PASSWORD;
+  if (!expectedUser || !expectedPass) {
+    return false;
+  }
   return user === expectedUser && pass === expectedPass;
 }
 

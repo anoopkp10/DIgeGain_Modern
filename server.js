@@ -1,4 +1,7 @@
 // server.ts
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from "express";
 import cookieParser from "cookie-parser";
 import multer from "multer";
@@ -317,8 +320,11 @@ async function verifySessionToken(token) {
   }
 }
 function validateAdminCredentials(user, pass) {
-  const expectedUser = process.env.ADMIN_USERNAME || (process.env.NODE_ENV === "production" ? "" : "admin");
-  const expectedPass = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === "production" ? "" : "Digegain@2026!");
+  const expectedUser = process.env.ADMIN_USERNAME;
+  const expectedPass = process.env.ADMIN_PASSWORD;
+  if (!expectedUser || !expectedPass) {
+    return false;
+  }
   return user === expectedUser && pass === expectedPass;
 }
 

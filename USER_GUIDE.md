@@ -55,7 +55,7 @@ In-chat lead capture: mini form (name/email/phone/message) -> saved as source ai
 Any WhatsApp button opens https://wa.me/<digits>?text=<message> with pre-written Hi DIGEGAIN text. No login.
 
 ## 5. Admin Panel (/admin)
-Login with Admin Username + Master Password. Local default: admin / Digegain@2026! (Auto-fill button). Change in production!
+Login with Admin Username + Master Password. Set ADMIN_USERNAME and ADMIN_PASSWORD environment variables. No defaults provided.
 5 tabs (default Leads):
 
 ### 5.1 Leads

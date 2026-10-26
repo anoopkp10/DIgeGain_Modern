@@ -65,7 +65,7 @@ TODO: hash admin password, CSRF, persistent limiter, audit log, SECRET length ch
 Contact{companyName,tagline,email,phone,whatsappNumber,whatsappMessage,address,geo,google URLs,workingHours[],socials}. PortfolioItem{id,slug,title,category Booking|Order|Portfolio|Dashboard|Other,description,clientName,projectUrl,tags[],media[{type,path,alt}],coverIndex,featured,order,dates}. Lead{id,name,email,phone,service,budget,message,source, emailStatus,status new|contacted|closed,createdAt}. Assistant{enabled,name,greeting,suggestedQuestions[],extraKnowledge[{id,question,answer,public}],leadCaptureEnabled}. Settings{notifyEmail,siteUrl,smtp?{host,port,user,pass,secure,fromEmail,fromName}}.
 
 ## 7. Env, Run, Deploy
-.env from .env.example. Prod required: ADMIN_USERNAME/PASSWORD/SESSION_SECRET. Email: SMTP_HOST/PORT/USER/PASS/SECURE, MAIL_FROM, ADMIN_NOTIFY_EMAIL. AI: GEMINI_API_KEY, LLM_MODEL. System: NODE_ENV=production, PORT. Dev defaults: admin/Digegain@2026!, notify anoopkp10@gmail.com.
+.env from .env.example. Prod required: ADMIN_USERNAME/PASSWORD/SESSION_SECRET. Email: SMTP_HOST/PORT/USER/PASS/SECURE, MAIL_FROM, ADMIN_NOTIFY_EMAIL. AI: GEMINI_API_KEY, LLM_MODEL. System: NODE_ENV=production, PORT.
 Local: npm i -> .env -> npm run dev (:3000) -> npm run lint. Build: npm run build -> npm start.
 Hostinger Node22+: root=project, startup server.js / npm start, npm ci --include=dev && npm run build, persist data/ + uploads/, set env, restart. /api/appdata 404=wrong app binding/start file; 500=missing example/unwritable data/.
 Ops: backup data/*.json + uploads/ before updates. Fix SMTP -> Verify -> Resend.

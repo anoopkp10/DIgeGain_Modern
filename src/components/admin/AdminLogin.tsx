@@ -118,27 +118,6 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onBackToSite 
             </button>
           </form>
 
-          {/* Quick Credential Hint */}
-          <div className="p-3 rounded-xl bg-[#060D1A]/80 border border-white/5 space-y-1.5 text-xs font-mono">
-            <div className="flex items-center justify-between text-slate-400">
-              <span>Default Credentials:</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername('admin');
-                  setPassword('Digegain@2026!');
-                }}
-                className="text-[#0EA5E9] hover:underline font-bold text-[11px]"
-              >
-                Auto-fill
-              </button>
-            </div>
-            <div className="flex items-center justify-between text-[11px] text-slate-400">
-              <span>Username: <strong className="text-white">admin</strong></span>
-              <span>Password: <strong className="text-white">Digegain@2026!</strong></span>
-            </div>
-          </div>
-
           <div className="pt-1 text-center text-xs text-slate-500 font-mono">
             Protected by JOSE session authentication
           </div>
